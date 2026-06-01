@@ -1,0 +1,227 @@
+.notification-btn {
+    position: relative;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    transition: all 0.3s ease;
+}
+
+.notification-btn:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--color-secondary-light);
+    color: white;
+    font-size: 0.7rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.message-badge {
+    background-color: var(--color-secondary);
+}
+
+.demo-section {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.demo-title {
+    color: var(--color-primary);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.modal-header-custom {
+    background-color: var(--color-primary);
+    color: white;
+    border-bottom: none;
+    border-radius: 0;
+    padding: 1.2rem 1.5rem;
+}
+
+.modal-header-custom .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.8;
+}
+
+.modal-header-custom .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-title-custom {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.modal-content-custom {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.notification-modal-body {
+    padding: 0;
+}
+
+.notification-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--light-color);
+}
+
+.notification-header h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.mark-all-read-btn {
+    background-color: var(--color-primary);
+    border: none;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.mark-all-read-btn:hover {
+    color: white;
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-list::-webkit-scrollbar {
+    background-color: #ffffff;
+    width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background-color: #bfbfbf;
+    border-radius: 10px;
+    width: 6px;
+}
+
+.notification-item {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #f8fafc;
+}
+
+.notification-item.unread {
+    background-color: var(--unread-bg);
+    border-right: 5px solid var(--color-primary);
+}
+
+.notification-item.unread:hover {
+    background-color: #e6f0ff;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--dark-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-title .status-badge {
+    background-color: var(--color-secondary-light);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+}
+
+.notification-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+}
+
+.notification-time {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.notification-time i {
+    margin-left: 5px;
+    font-size: 0.9rem;
+}
+
+.empty-notifications {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.empty-notifications i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .notification-item {
+        padding: 1rem;
+    }
+
+    .notification-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .mark-all-read-btn {
+        align-self: flex-end;
+    }
+}

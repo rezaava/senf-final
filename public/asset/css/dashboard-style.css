@@ -1,0 +1,292 @@
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 100;
+    src: url("fonts/woff/IRANSansXFaNum-thin.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-thin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 200;
+    src: url("fonts/woff/IRANSansXFaNum-UltraLight.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-UltraLight.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 300;
+    src: url("fonts/woff/IRANSansXFaNum-light.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-light.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 500;
+    src: url("fonts/woff/IRANSansXFaNum-medium.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-medium.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 600;
+    src: url("fonts/woff/IRANSansXFaNum-demibold.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-demibold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 800;
+    src: url("fonts/woff/IRANSansXFaNum-extrabold.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-extrabold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 900;
+    src: url("fonts/woff/IRANSansXFaNum-black.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-black.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: bold;
+    src: url("fonts/woff/IRANSansXFaNum-bold.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-bold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/woff/IRANSansXFaNum-regular.woff") format("woff"),
+        url("fonts/woff2/IRANSansXFaNum-regular.woff2") format("woff2");
+}
+
+.ss02 {
+    -moz-font-feature-settings: "ss02";
+    -webkit-font-feature-settings: "ss02";
+    font-feature-settings: "ss02";
+}
+
+.ss03 {
+    -moz-font-feature-settings: "ss03";
+    -webkit-font-feature-settings: "ss03";
+    font-feature-settings: "ss03";
+}
+
+body {
+    font-family: "IRANSansX";
+    /* background-color: #ededed; */
+    background-color: #133E87;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* .alert {
+    top: 20px;
+    right: 50px;
+    position: absolute;
+} */
+
+/* side bar */
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    /* width: 250px; */
+    height: 100vh;
+    overflow-y: scroll;
+    /* box-shadow: -10px 0px 50px 5px rgb(234, 234, 234); */
+    /* background-color: white; */
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar-item {
+    /* background-color: white; */
+    border-radius: 15px;
+    margin-top: 15px;
+    /* background-color: #5b6cbabc; */
+    /* background: #576CBC; */
+    background: #ffffff;
+    backdrop-filter: blur(30px);
+}
+
+.sidebar-item a {
+    font-size: 16px;
+    /* color: #292d32; */
+    color: #1b1b1b;
+}
+
+.sidebar-item a:hover {
+    transition: 200ms;
+    color: #0b4cff;
+}
+
+.accordion-card {
+    border-radius: 15px;
+    border: none;
+    margin-top: 15px;
+}
+
+.accordion-card-body a {
+    font-size: 15px;
+}
+
+.accordion-link {
+    font-size: 16px;
+}
+
+.accordion-link:hover {
+    transition: 200ms;
+    color: #0b4cff;
+}
+
+.accordion-link:active {
+    border: none;
+}
+
+.sidebar-item-active {
+    /* background-color: #e93f3f; */
+    color: #0b4cff;
+}
+
+/* main card */
+.main-card-col {
+    width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.transactions-row {
+    background: #ffffff;
+    backdrop-filter: blur(30px);
+}
+
+.table th {
+    color: #000000;
+    background-color: #ffffff;
+    /* backdrop-filter: blur(30px); */
+}
+
+.table td {
+    color: #000000;
+
+    background-color: #ffffff;
+    /* backdrop-filter: blur(30px); */
+}
+
+/* product description */
+.description-nav {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    background-color: #fff4f4b5;
+}
+
+.description-li {
+    margin: 0px 5px 0px 5px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: white;
+    border-top: 3px solid #e93f3f;
+}
+
+.description-li a {
+    color: #494949;
+}
+
+.description-li a:hover {
+    color: #0b4cff;
+}
+
+.info-ul li {
+    width: 100%;
+    background-color: #f7f9fa;
+}
+
+.info-ul li:first-child {
+    /* border-radius: 10px; */
+    width: 200px;
+    background-color: #f0f1f2;
+}
+
+/* gallery */
+/* Add numbers to pagination buttons by CSS */
+/* .splide__pagination {
+    counter-reset: pagination-num;
+}
+
+.splide__pagination__page:before {
+    counter-increment: pagination-num;
+    content: counter(pagination-num);
+} */
+
+/* pagination */
+.page-item {
+    margin: 10px;
+    margin-top: 0px;
+    border-radius: 15px;
+}
+
+.page-item a {
+    color: #171717;
+    font-size: 15px;
+    border-width: 2px;
+    border-radius: 5px;
+}
+
+.page-item a:hover {
+    border-color: #0b4cff;
+    background-color: white;
+    color: #171717;
+}
+
+.this-page a {
+    background-color: #0b4cff;
+    border-color: #0b4cff;
+    color: #ffffff;
+}
+
+.sidebarmobilebtn {
+    display: none;
+}
+
+.sidebarmobile-item {
+    background-color: white;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+
+.sidebarmobile-item a {
+    font-size: 18px;
+    color: #292d32;
+}
+
+.sidebarmobile-item a:hover {
+    transition: 200ms;
+    color: #0b4cff;
+}
+
+@media screen and (max-width: 992px) {
+    .sidebar-col {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .navbar {
+        display: none;
+    }
+}
