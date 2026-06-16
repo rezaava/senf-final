@@ -12,13 +12,13 @@ class CategoryController extends Controller
 
     public function list()
     {
-        $categories = Category::all();
+        $categories = Category::whereNull('parent_id')->get();
         return view("dashboard.category.categories", compact("categories"));
     }
 
-    public function listParent()
+    public function listParent($id)
     {
-        $categories = Category::all();
+        $categories = Category::where('parent_id' , $id)->get();
         return view("dashboard.category.categoryParent", compact("categories"));
     }
 

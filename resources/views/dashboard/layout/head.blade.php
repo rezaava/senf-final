@@ -12,55 +12,66 @@
     <link href="https://lib.arvancloud.ir/sweetalert2/9.17.4/sweetalert2.min.css" rel="stylesheet">
     <style>
       
-        :root {
-            --primary-color: #BC8A89;        /* قرمز مایل به قهوه‌ای (رنگ اول - مرکزی) */
-            --secondary-color: #8B6B6A;      /* نسخه تیره‌تر رنگ جدید (رنگ دوم) */
-            --there-color: #11b460;          /* سبز (رنگ سوم) */
-            --accent-color: #D4B4B3;         /* نسخه روشن‌تر رنگ جدید (رنگ کمکی) */
-            --light-color: #f8f9fa;          /* سفید مایل به خاکستری */
-            --dark-color: #212529;           /* تقریبا مشکی */
-            --construction-color: #BC8A89;   /* هماهنگ با رنگ جدید */
-                    
-            /* نگاشت به متغیرهای قبلی برای سازگاری */
-            --main-bg: var(--light-color);                 /* #f8f9fa */
-            --sidebar-bg: #ffffff;                         /* سفید خالص */
-            --card-bg: #ffffff;                            /* سفید */
-            --card-border: #e9ecef;                        /* خاکستری خیلی روشن */
-            --accent-green: var(--primary-color);          /* اکنون #BC8A89 */
-            --text-main: #2188a7;                /* #212529 */
-            --text-secondary: #5a6e8a;                     /* آبی-خاکستری ملایم */
-            --hover-color: #F5EEEE;                        /* نسخه بسیار روشن رنگ جدید برای hover */
-            --active-color: #EBE0E0;                       /* نسخه روشن‌تر برای active */
-            --input-bg: #ffffff;
-            --input-border: #cbd5e1;                       /* خاکستری آبی روشن */
-            --input-focus-border: var(--primary-color);    /* #BC8A89 */
-            --input-focus-shadow: rgba(188, 138, 137, 0.2);  /* سایه رنگ جدید */
-            --input-placeholder: #94a3b8;
-            --input-disabled-bg: #f1f5f9;
-            --input-disabled-text: #64748b;
-            --btn-primary-bg: var(--primary-color);        /* #BC8A89 */
-            --btn-primary-hover: #A97A79;                  /* تیره‌تر از رنگ جدید */
-            --btn-primary-active: #966B6A;                 /* تیره‌تر */
-            --btn-primary-text: #ffffff;
-                    
-            /* دکمه ثانویه (همان سبز باقی می‌ماند) */
-            --btn-secondary-bg: var(--there-color);        /* #11b460 سبز */
-            --btn-secondary-hover: #0e9e54;
-            --btn-secondary-active: #0b8848;
-                    
-            /* ظاهر بدون تغییر */
-            --card-radius: 20px;
-            --sidebar-width: 240px;
-            --sidebar-width-collapsed: 75px;
-            --sidebar-icon-size: 1.4rem;
-            --transition: 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);
-                    
-            /* رنگ اسکرول مطابق تم جدید */
-            --scroll-track: #f1f5f9;
-            --scroll-thumb: var(--primary-color);           /* #BC8A89 */
-            --scroll-thumb-hover: var(--secondary-color);   /* #8B6B6A */
-            --scroll-width: 10px;
-        }
+    :root {
+        /* پالت اصلی */
+        --primary-color: #2C5EAD;
+        --secondary-color: #1591DC;
+        --there-color: #4BB8FA;
+        --accent-color: #C4E2F5;
+    
+        /* پس‌زمینه‌ها */
+        --main-bg: #EAF5FD;
+        --sidebar-bg: #D8ECFA;
+        --card-bg: #F4FBFF;
+        --card-border: #A8D3F0;
+    
+        /* متن */
+        --text-main: #2C5EAD;
+        --text-secondary: #1591DC;
+    
+        /* تعاملات */
+        --hover-color: #D9EFFD;
+        --active-color: #C4E2F5;
+    
+        /* فرم‌ها */
+        --input-bg: #FFFFFF;
+        --input-border: #8CCBF2;
+        --input-focus-border: #1591DC;
+        --input-focus-shadow: rgba(21, 145, 220, 0.25);
+    
+        --input-placeholder: #5CA9DD;
+        --input-disabled-bg: #E3F3FD;
+        --input-disabled-text: #6A9FC2;
+    
+        /* دکمه اصلی */
+        --btn-primary-bg: #2C5EAD;
+        --btn-primary-hover: #245093;
+        --btn-primary-active: #1D427A;
+        --btn-primary-text: #FFFFFF;
+    
+        /* دکمه ثانویه */
+        --btn-secondary-bg: #1591DC;
+        --btn-secondary-hover: #117FC1;
+        --btn-secondary-active: #0D6BA4;
+        --btn-secondary-text: #FFFFFF;
+    
+        /* اسکرول */
+        --scroll-track: #DDEFFC;
+        --scroll-thumb: #1591DC;
+        --scroll-thumb-hover: #2C5EAD;
+    
+        /* سایر */
+        --construction-color: #2C5EAD;
+        --light-color: #F4FBFF;
+        --dark-color: #2C5EAD;
+    
+        --card-radius: 20px;
+        --sidebar-width: 240px;
+        --sidebar-width-collapsed: 75px;
+        --sidebar-icon-size: 1.4rem;
+        --transition: 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);
+        --scroll-width: 10px;
+    }
 
         @font-face {
             font-family: dana;
@@ -189,7 +200,7 @@
             white-space: nowrap;
         }
         .sidebar .nav-link.active {
-            background: linear-gradient(135deg, var(--primary-color), #6B4E4D);
+            background: linear-gradient(135deg, var(--primary-color),var(--there-color));
             color: #fff!important;
             font-weight: bold;
             box-shadow: 0 5px 15px rgba(67, 233, 123, 0.3);

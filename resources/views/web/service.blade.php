@@ -276,15 +276,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- مراحل رزرو -->
-                    <div class="step-indicator">
-                        <div class="step active">1</div>
-                        <div class="step-line"></div>
-                        <div class="step">2</div>
-                        <div class="step-line"></div>
-                        <div class="step">3</div>
-                    </div>
-
                     <!-- مرحله 1: انتخاب آرایشگر، تاریخ و زمان -->
                     <div class="step-content" id="step1">
                         <h6 class="text-center mb-4">آرایشگر، تاریخ و زمان مورد نظر خود را انتخاب کنید</h6>
@@ -330,97 +321,12 @@
                             <p class="mt-2 text-muted">در حال بارگذاری ساعت‌ها...</p>
                         </div>
                     </div>
-
-
-                    <!-- مرحله 2: آپلود عکس -->
-                    <div class="step-content d-none" id="step2">
-                        <h6 class="text-center mb-4">عکس مدل موی مورد نظر خود را آپلود کنید</h6>
-
-                        <div class="upload-area" id="uploadArea">
-                            <i class="bi bi-cloud-arrow-up"></i>
-                            <h5>برای آپلود عکس اینجا کلیک کنید</h5>
-                            <p class="text-muted">فرمت‌های مجاز: JPG, PNG (حداکثر 5MB)</p>
-                            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                            <img id="previewImage" class="preview-image" alt="پیش‌نمایش عکس">
-                        </div>
-
-                        <div class="form-check mt-3">
-                            <input class="form-check-input" type="checkbox" id="noReferenceImage">
-                            <label class="form-check-label" for="noReferenceImage">
-                                عکس مرجع ندارم
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- مرحله 3: پرداخت -->
-                    <div class="step-content d-none" id="step3">
-                        <h6 class="text-center mb-4">پرداخت نهایی</h6>
-
-                        <div class="reservation-summary mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>خدمت:</span>
-                                <span id="finalService">کوتاهی و استایل موی زنانه</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>آرایشگر:</span>
-                                <span id="finalStaff">الهام احمدی</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>تاریخ:</span>
-                                <span id="finalDate">سه شنبه، 4 مهر 1402</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>زمان:</span>
-                                <span id="finalTime">11:00</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>مدت زمان:</span>
-                                <span>{{ $service->time }}</span>
-                            </div>
-                            <hr>
-                            {{-- <div class="d-flex justify-content-between mb-2">
-                                <span>هزینه:</span>
-                                <span>120,000 تومان</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>تخفیف:</span>
-                                <span class="text-success">18,000 تومان</span>
-                            </div> --}}
-                            <div class="d-flex justify-content-between fw-bold">
-                                <span>قابل پرداخت:</span>
-                                <span id="finalPrice">{{ $service->price }} تومان</span>
-                            </div>
-                        </div>
-
-                        <h6 class="mb-3">روش پرداخت را انتخاب کنید:</h6>
-                        <div class="payment-options">
-                            <div class="payment-option" data-method="online">
-                                <i class="bi bi-credit-card"></i>
-                                <div>پرداخت آنلاین</div>
-                            </div>
-                            <div class="payment-option" data-method="wallet">
-                                <i class="bi bi-wallet2"></i>
-                                <div>کیف پول</div>
-                            </div>
-                            <div class="payment-option" data-method="cash">
-                                <i class="bi bi-cash"></i>
-                                <div>پرداخت در محل</div>
-                            </div>
-                        </div>
-
-                        <div class="form-check mt-4">
-                            <input class="form-check-input" type="checkbox" id="agreeTerms">
-                            <label class="form-check-label" for="agreeTerms">
-                                با <a href="#" class="text-primary">قوانین و شرایط</a> رزرو موافقم
-                            </label>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer bg-white sticky-bottom">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
                     <button type="button" class="btn btn-outline-primary d-none" id="prevStep">مرحله قبل</button>
                     <button type="button" class="btn btn-primary {{ $service->price_max ? '' : 'd-none' }}" id="nextStep">مرحله بعد</button>
-                    <button type="button" class="btn btn-success {{ $service->price_max ? 'd-none' : '' }}" id="confirmReserve">افزودن به سبد خرید</button>
+                    <button type="button" class="btn btn-success {{ $service->price_max ? 'd-none' : '' }}" id="confirmReserve">رزور نوبت  </button>
                 </div>
             </div>
         </div>

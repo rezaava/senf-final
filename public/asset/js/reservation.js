@@ -530,83 +530,74 @@ function updateStepIndicator() {
 // ===========================
 // 📌 آپلود عکس
 // ===========================
-const uploadArea = document.getElementById("uploadArea");
-const imageInput = document.getElementById("imageUpload");
-const previewImage = document.getElementById("previewImage");
+// const uploadArea = document.getElementById("uploadArea");
+// const imageInput = document.getElementById("imageUpload");
+// const previewImage = document.getElementById("previewImage");
 
-uploadArea.addEventListener("click", () => {
-    imageInput.value = "";
-    imageInput.click();
-});
+// uploadArea.addEventListener("click", () => {
+//     imageInput.value = "";
+//     imageInput.click();
+// });
 
-imageInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) handleFile(file);
-});
+// imageInput.addEventListener("change", (e) => {
+//     const file = e.target.files[0];
+//     if (file) handleFile(file);
+// });
 
-uploadArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadArea.classList.add("dragover");
-});
+// uploadArea.addEventListener("dragover", (e) => {
+//     e.preventDefault();
+//     uploadArea.classList.add("dragover");
+// });
 
-uploadArea.addEventListener("dragleave", (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove("dragover");
-});
+// uploadArea.addEventListener("dragleave", (e) => {
+//     e.preventDefault();
+//     uploadArea.classList.remove("dragover");
+// });
 
-uploadArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove("dragover");
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-});
+// uploadArea.addEventListener("drop", (e) => {
+//     e.preventDefault();
+//     uploadArea.classList.remove("dragover");
+//     const file = e.dataTransfer.files[0];
+//     if (file) handleFile(file);
+// });
 
-function handleFile(file) {
-    if (file.size > 5 * 1024 * 1024) {
-        alert("حجم فایل نباید بیشتر از 5MB باشد.");
-        return;
-    }
+// function handleFile(file) {
+//     if (file.size > 5 * 1024 * 1024) {
+//         alert("حجم فایل نباید بیشتر از 5MB باشد.");
+//         return;
+//     }
 
-    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!validTypes.includes(file.type)) {
-        alert("فقط فایل‌های JPG و PNG مجاز هستند.");
-        return;
-    }
+//     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+//     if (!validTypes.includes(file.type)) {
+//         alert("فقط فایل‌های JPG و PNG مجاز هستند.");
+//         return;
+//     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        previewImage.src = e.target.result;
-        previewImage.style.display = "block";
-        uploadArea.classList.add("active");
-        uploadArea.querySelector("h5").textContent = "عکس با موفقیت آپلود شد";
-        uploadArea.querySelector("p").textContent =
-            "برای تغییر عکس، کلیک یا درگ مجدد کنید";
-    };
-    reader.readAsDataURL(file);
-}
+//     const reader = new FileReader();
+//     reader.onload = (e) => {
+//         previewImage.src = e.target.result;
+//         previewImage.style.display = "block";
+//         uploadArea.classList.add("active");
+//         uploadArea.querySelector("h5").textContent = "عکس با موفقیت آپلود شد";
+//         uploadArea.querySelector("p").textContent =
+//             "برای تغییر عکس، کلیک یا درگ مجدد کنید";
+//     };
+//     reader.readAsDataURL(file);
+// }
 
 // ===========================
 // 📌 انتخاب روش پرداخت
 // ===========================
-$(document).on("click", ".payment-option", function () {
-    $(".payment-option").removeClass("active");
-    $(this).addClass("active");
-    selectedPaymentMethod = $(this).data("method");
-});
+// $(document).on("click", ".payment-option", function () {
+//     $(".payment-option").removeClass("active");
+//     $(this).addClass("active");
+//     selectedPaymentMethod = $(this).data("method");
+// });
 
 // ===========================
 // 📌 تایید نهایی رزرو
 // ===========================
 $("#confirmReserve").click(function () {
-    // if (!$("#agreeTerms").is(":checked")) {
-    //     alert("لطفا با قوانین و شرایط موافقت کنید.");
-    //     return;
-    // }
-
-    // if (!selectedPaymentMethod) {
-    //     alert("لطفا روش پرداخت را انتخاب کنید.");
-    //     return;
-    // }
 
     const formData = new FormData();
 
@@ -619,10 +610,10 @@ $("#confirmReserve").click(function () {
     formData.append("payment_method", selectedPaymentMethod);
 
     // عکس مرجع اگر آپلود شده باشه
-    const file = imageInput.files[0];
-    if (file) {
-        formData.append("reference_image", file);
-    }
+    // const file = imageInput.files[0];
+    // if (file) {
+    //     formData.append("reference_image", file);
+    // }
     const token = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
@@ -635,7 +626,7 @@ $("#confirmReserve").click(function () {
         processData: false, // مهم: اجازه نده jQuery داده‌ها رو رشته کنه
         contentType: false, // مهم: اجازه بده مرورگر خودش نوع multipart/form-data رو ست کنه
         success: function (response) {
-            alert("نوبت شما با موفقیت رزرو شد!");
+            //alert("نوبت شما با موفقیت رزرو شد!");
             $("#reservationModal").modal("hide");
             resetForm();
 
@@ -724,4 +715,29 @@ $(document).ready(function () {
 
 $("#reservationModal").on("hidden.bs.modal", function () {
     resetForm();
+});
+
+document.getElementById('confirmReserve').addEventListener('click', function () {
+
+    Swal.fire({
+        icon: 'success',
+        title: 'رزرو با موفقیت انجام شد',
+        text: 'نوبت شما با موفقیت رزرو گردید.',
+        confirmButtonText: 'ادامه می‌دهم',
+        showCancelButton: true,
+        cancelButtonText: 'مشاهده نوبت‌های رزرو شده'
+    }).then((result) => {
+            
+        if (result.isConfirmed) {
+            $("#reservationModal").modal("hide");
+             resetForm();
+        }
+            
+        if (result.dismiss === Swal.DismissReason.cancel) {
+            // رفتن به صفحه نوبت‌های رزرو شده
+            window.location.href = '/cart';
+        }
+            
+    });
+
 });

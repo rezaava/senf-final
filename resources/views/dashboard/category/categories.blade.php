@@ -41,8 +41,8 @@
                                     <img src="{{ asset($category->image) }}" alt="image" width="80px">
                                 </td>
                                 <td class="align-middle">
-                                    <a href="/dashboard/categories/parent"
-                                        class="text-success mx-1"><i class="fa-solid fa-right-to-bracket"></i></a>
+                                    <a href="/dashboard/categories/parent/{{ $category->id }}"
+                                        class="btn-success btn-sm btn">زیر دسته بندی</a>
                                     <a href="{{ route('category.edit', ['id' => $category->id]) }}"
                                         class="text-success mx-1"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <a href="{{ route('category.delete', ['id' => $category->id]) }}"

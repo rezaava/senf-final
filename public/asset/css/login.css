@@ -148,13 +148,14 @@
 
     .verification-inputs {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 10px;
         margin-bottom: 25px;
     }
 
     .verification-input {
-        width: 55px;
-        height: 55px;
+        width: 45px;
+        height: 45px;
         text-align: center;
         font-size: 20px;
         font-weight: bold;
@@ -182,10 +183,10 @@
         padding: 15px;
         border-radius: 12px;
         font-weight: 600;
-        font-size: 16px;
+        font-size: 0.9rem;
         width: 100%;
         transition: all 0.3s;
-        margin-top: 20px;
+        margin-top: 6px;
     }
 
     .submit-btn:hover:not(:disabled) {

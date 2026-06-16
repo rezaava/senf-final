@@ -1,6 +1,37 @@
 @extends('web.layouts.master')
 @section('head')
     <link rel="stylesheet" href="{{ asset('asset/css/cart.css') }}">
+    <style>
+        .payment-card {
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: .3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+            transition: all 0.25s ease-in-out;
+            border: 2px solid transparent;
+        }
+
+        .active-card{
+            border-color: var(--color-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #0d6efd;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
 @endsection
 @section('content')
     <!-- هدر -->
@@ -78,11 +109,66 @@
                         <span class="total-price">{{ number_format($cart->reservations->sum('total_price')) }} تومان</span>
                     </div>
                 </div>
-                <button class="checkout-btn">
+                <button class="checkout-btn" data-bs-toggle="modal" data-bs-target="#paymentModal">
                     <i class="bi bi-wallet2 me-2"></i>
                     پرداخت و نهایی‌سازی
                 </button>
             </div>
+
+            <!-- Modal Pay -->
+            <div class="modal fade" id="paymentModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg">
+                    
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                انتخاب روش پرداخت
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                    
+                        <div class="modal-body">
+                            <div class="row g-3">
+                            
+                                <!-- کیف پول -->
+                                <div class="col-6">
+                                    <div class="card payment-card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-wallet2 display-5 text-primary"></i>
+                                            <h6 class="mt-3 fw-bold">کیف پول</h6>
+                                            <small class="text-muted">
+                                                پرداخت از موجودی
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- کارت بانکی -->
+                                <div class="col-6">
+                                    <div class="card payment-card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-credit-card-2-front display-5 text-success"></i>
+                                            <h6 class="mt-3 fw-bold">کارت بانکی</h6>
+                                            <small class="text-muted">
+                                                پرداخت آنلاین
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    
+                        <div class="modal-footer">
+                            <button class="btn btn-primary w-100 payFinally">
+                                ادامه پرداخت
+                            </button>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+
         @else
             <!-- پیام سبد خرید خالی (در صورت نیاز) -->
             <div id="emptyCartMessage" class="">
@@ -163,12 +249,28 @@
         }
 
         // شبیه‌سازی کلیک روی دکمه پرداخت
-        document.querySelector('.checkout-btn').addEventListener('click', function() {
+
+        const modalElement = document.getElementById('paymentModal');
+        const paymentModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        const cards = document.querySelectorAll('.payment-card');
+
+        cards.forEach((card)=>{
+            card.addEventListener('click' , function(){
+                cards.forEach((card)=>{
+                    card.classList.remove('active-card')
+                })
+                card.classList.add('active-card')
+            })
+        })
+
+        document.querySelector('.payFinally').addEventListener('click', function() {
             const itemCount = document.querySelectorAll('.cart-item').length;
 
             if (itemCount > 0) {
                 alert(`پرداخت با موفقیت انجام شد! ${itemCount} نوبت رزرو شده پرداخت و نهایی شد.`);
-                // در اینجا کد واقعی پرداخت را اضافه کنید
+                paymentModal.hide();
+                
             } else {
                 alert('سبد خرید شما خالی است!');
             }

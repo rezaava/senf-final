@@ -177,7 +177,7 @@ Route::middleware(['auth' , 'role:admin|manager|operator' ])->group(function () 
         // categories
         Route::prefix('/categories')->group(function () {
             Route::get('/', [CategoryController::class, 'list'])->name('category.list');
-            Route::get('/parent', [CategoryController::class, 'listParent']);
+            Route::get('/parent/{id}', [CategoryController::class, 'listParent']);
             Route::get('/new', [CategoryController::class, 'new'])->name('category.new');
             Route::post('/new', [CategoryController::class, 'newPost'])->name('category.newPost');
             Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('category.edit');
