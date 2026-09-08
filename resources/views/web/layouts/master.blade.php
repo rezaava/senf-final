@@ -26,11 +26,63 @@
     <link rel="stylesheet" href="{{ asset('asset/css/splide.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/inputs.css') }}">
     @yield('head')
+
+    <style>
+        body{
+            overflow: hidden;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 28rem;
+            height: 100vh;
+            background: #C79493;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .overlay img {
+            animation: logoAnimation 1.5s infinite ease-in-out;
+        }
+
+        @keyframes logoAnimation {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+        
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        
+            100% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+        }
+
+    </style>
 </head>
 
-<body>
-    <div class="container main-container pb-5 position-relative"
-        style="max-width: 28rem;background: url({{ asset('asset/images/back3.jpg') }}) no-repeat center center;min-height: 100dvh;">
+<body >
+    <div class="container main-container pb-5 position-relative" style="max-width: 28rem;background: url({{ asset('asset/images/back3.jpg') }}) no-repeat center center;min-height: 100dvh;">
+        <div class="overlay position-absolute" id="loader">
+            <img id="img" class="w-50" src="{{ asset('images/logo.png') }}" alt="logo">
+        </div>
+
         @yield('content')
 
         <!-- Bottom Navigation Bar -->
@@ -95,6 +147,25 @@
     <script src="{{ asset('asset/js/inputs.js') }}"></script>
     <script src="{{ asset('asset/js/main.js') }}"></script>
     <script src="https://lib.arvancloud.ir/sweetalert2/9.17.4/sweetalert2.all.js"></script>
+
+        <script>
+            window.addEventListener("load", function () {
+                let loader = document.querySelector('#loader');
+                let img = document.querySelector('#img');
+                document.body.style.overflow = "hidden";
+
+                setTimeout(() => {
+                    loader.classList.add("hide");
+                    document.body.style.overflow = "auto";
+                    setTimeout(() => {
+                        loader.remove();
+                    }, 800);
+
+                }, 1000);
+
+            });
+        </script>
+
     @if (Session::has('success'))
         <script>
             Swal.fire({

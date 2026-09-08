@@ -4,6 +4,7 @@
     <script src="{{ asset('asset/js/notification.js') }}"></script>
 @endsection
 @section('content')
+    
     <div class="container">
         <div class="header-main mb-3">
             <div class="d-flex justify-content-between align-items-center">

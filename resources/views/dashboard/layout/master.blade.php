@@ -5,15 +5,28 @@
 
 <body>
 
+    @if(Auth::user()->roles->first()->name == 'admin' || Auth::user()->roles->first()->name == 'manager' || Auth::user()->roles->first()->name == 'operator' )
     @include('dashboard.layout.sidebar')
-
+    @endif
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="header d-flex justify-content-between align-items-center mb-5 mt-md-0" style="margin-top: 3.5rem">
-            <div>
-                <h3 style="font-family: dana-lg">@yield('onvan') </h3>
-                @yield('title-small')
+            
+            <div class="d-flex align-items-center gap-2">
+
+                @if(Auth::user()->roles->first()->name == 'admin' || Auth::user()->roles->first()->name == 'manager' || Auth::user()->roles->first()->name == 'operator' )
+                <button class="mobile-menu-btn" id="mobileMenuBtn" style="display:none;">
+                    <i class="fas fa-bars"></i>
+                </button>
+                @endif
+
                 
+
+                <div>
+                    <h3 style="font-family: dana-lg">@yield('onvan') </h3>
+                    @yield('title-small')
+                
+                </div>
             </div>
             <div class="user-info">
                 <img src="{{ asset('img/hamayesh.jpg') }}" class="user-avatar" alt="User">

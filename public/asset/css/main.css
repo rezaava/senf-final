@@ -99,7 +99,7 @@
     --color-secondary-dark: #d48f84;
     --color-secondary-light: #f3bdb4;
 
-    --color-background: #F3F3F3;
+    --color-background: #FFF2E9;
     --color-surface: #ffffff;
     --color-border: #e0e0e0;
     --color-text: #333333;
@@ -122,6 +122,7 @@ body {
 .btn-primary {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
+    
 }
 
 .btn-primary:hover,

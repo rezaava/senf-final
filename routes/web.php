@@ -70,6 +70,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // روت‌های پس از لاگین
 Route::middleware('auth')->group(function () {
+    Route::get('/api/cities/by-province/{province}', [WebUserController::class, 'getCitiesByProvince']);
     // ذخیره جنسیت (برای کاربران جدید)
     Route::post('/auth/save-gender', [OtpAuthController::class, 'saveGender'])
         ->name('auth.save.gender');
@@ -140,11 +141,11 @@ Route::delete('/cart/remove/{reservation}', [CartController::class, 'remove'])->
 });
 
 
+Route::middleware(['auth' , 'role:admin|manager|operator|user' ])->get('/cooperation', [RequestController::class, 'cooperation'])->name('cooperation');
 
-Route::middleware(['auth' , 'role:admin|manager|operator' ])->group(function () {
+Route::middleware(['auth' , 'role:admin|manager|operator|user' ])->group(function () {
     // dashboard pages ==================================================================================================================
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('index');
-    Route::get('/cooperation', [RequestController::class, 'cooperation'])->name('cooperation');
     Route::post('/organStore', [RequestController::class, 'organStore'])->name('organStore');
     Route::get('/operatorRequest', [RequestController::class, 'operatorRequest'])->name('operatorRequest');
     Route::post('/operatorStore', [RequestController::class, 'operatorStore'])->name('operatorStore');

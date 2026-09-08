@@ -296,10 +296,16 @@
                         <!-- end categories -->
 
                         <!-- تقویم هفته -->
+                        <!-- تقویم هفته -->
                         <div class="mb-3 week-container d-none" id="weekContainer">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <button class="btn btn-outline-secondary btn-sm" id="prevWeek">‹ هفته قبل</button>
+                                <button class="btn btn-outline-secondary btn-sm" id="prevMonth">‹‹ ماه قبل</button>
                                 <span class="fw-bold" id="monthTitle">مهر</span>
+                                <button class="btn btn-outline-secondary btn-sm" id="nextMonth">ماه بعد ››</button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <button class="btn btn-outline-secondary btn-sm" id="prevWeek">‹ هفته قبل</button>
+                                <span></span>
                                 <button class="btn btn-outline-secondary btn-sm" id="nextWeek">هفته بعد ›</button>
                             </div>
                             <div class="day-slider" id="daySlider"></div>

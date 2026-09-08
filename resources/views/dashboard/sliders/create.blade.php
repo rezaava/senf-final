@@ -40,6 +40,16 @@
                 @error('status') <small class="text-danger">{{ $message }}</small> @enderror
             </div>
 
+            <div class="mb-3">
+                <label for="type" class="form-label">محل انتخاب نمایش</label>
+                <select name="type" id="type" class="form-control">
+                    <option value="">انتخاب کنید</option>
+                    <option value="1" {{ old('type') == 1 ? 'selected' : '' }}>صفحه اصلی</option>
+                    <option value="2" {{ old('type') == 2 ? 'selected' : '' }}>تبلیغات</option>
+                </select>
+                @error('type') <small class="text-danger">{{ $message }}</small> @enderror
+            </div>
+
             <button type="submit" class="btn btn-primary">ثبت اسلایدر</button>
         </form>
     </div>

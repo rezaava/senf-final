@@ -62,8 +62,9 @@
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="price" class="form-label">قیمت (تومان)</label>
-                            <input type="number" class="form-control" name="price" id="price"
+                            <input type="text" class="form-control" id="price"
                                 placeholder="قیمت پایه دسته بندی را وارد کنید" />
+                                <input type="hidden" id="real_price" name="price">
                             @error('price')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -89,4 +90,18 @@
 @endsection
 
 @section('script')
+<script>
+    const price = document.getElementById('price');
+    const realPrice = document.getElementById('real_price');
+
+    price.addEventListener('input', function () {
+        let value = this.value.replace(/,/g, '').replace(/\D/g, '');
+    
+        realPrice.value = value;
+    
+        if (value) {
+            this.value = Number(value).toLocaleString('en-US');
+        }
+    });
+</script>
 @endsection

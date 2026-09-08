@@ -28,6 +28,9 @@ class OtpAuthController extends Controller
      */
     public function sendOtp(Request $request)
     {
+        // تبدیل ارقام فارسی/عربی شماره موبایل به انگلیسی قبل از اعتبارسنجی
+        $this->convertRequestNumbers($request, ['phone']);
+
         // شمارش دفعات ورود اشتباه
         $attempts = session()->get('login_attempts', 0);
 
@@ -90,6 +93,9 @@ class OtpAuthController extends Controller
      */
     public function verifyOtp(Request $request)
     {
+        // تبدیل ارقام فارسی/عربی کد وارد شده به انگلیسی قبل از اعتبارسنجی
+        $this->convertRequestNumbers($request, ['code']);
+
         $request->validate([
             'code' => ['required', 'digits:5'],
         ]);
@@ -371,6 +377,9 @@ class OtpAuthController extends Controller
      */
     public function selectSalon(Request $request)
     {
+        // تبدیل ارقام فارسی/عربی شناسه‌ی سالن به انگلیسی (احتیاط، در صورت ورود دستی)
+        $this->convertRequestNumbers($request, ['salon_id']);
+
         $request->validate([
             'salon_id' => ['required', 'integer'],
         ]);
@@ -565,5 +574,40 @@ class OtpAuthController extends Controller
             'message' => 'ثبت نام با موفقیت تکمیل شد',
             'redirect_url' => $this->getRedirectUrl($user, $request->role),
         ]);
+    }
+
+    /**
+     * تبدیل ارقام فارسی و عربی به انگلیسی برای فیلدهای مشخص‌شده در Request
+     * مثال استفاده: $this->convertRequestNumbers($request, ['phone', 'code']);
+     */
+    protected function convertRequestNumbers(Request $request, array $fields): void
+    {
+        $merge = [];
+
+        foreach ($fields as $field) {
+            if ($request->has($field) && is_string($request->input($field))) {
+                $merge[$field] = $this->convertToEnglishNumbers($request->input($field));
+            }
+        }
+
+        if (! empty($merge)) {
+            $request->merge($merge);
+        }
+    }
+
+    /**
+     * تبدیل رشته حاوی ارقام فارسی/عربی به معادل انگلیسی
+     * همچنین فاصله‌های اضافی احتمالی را حذف می‌کند.
+     */
+    protected function convertToEnglishNumbers(string $input): string
+    {
+        $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        $arabic  = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+        $input = str_replace($persian, $english, $input);
+        $input = str_replace($arabic, $english, $input);
+
+        return trim($input);
     }
 }

@@ -16,9 +16,9 @@
         }
     </style>
 
-    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display:none;">
+    {{-- <button class="mobile-menu-btn" id="mobileMenuBtn" style="display:none;">
         <i class="fas fa-bars"></i>
-    </button>
+    </button> --}}
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -173,10 +173,10 @@
                                     href="{{ route('special-offers.edit') }}" id="add-list"> شگفت انگیز </a>
                             </li> --}}
 
-                            <li class="nav-item {{ request()->routeIs('coupons.index') ? 'activeLi' : '' }}">
+                            {{-- <li class="nav-item {{ request()->routeIs('coupons.index') ? 'activeLi' : '' }}">
                                 <a class="nav-link {{ request()->routeIs('coupons.index') ? 'active1' : '' }}"
                                     href="{{ route('coupons.index') }}" id="add-list"> کدتخفیف </a>
-                            </li>
+                            </li> --}}
 
 
                         </ul>
@@ -390,10 +390,10 @@
                                     href="{{ route('special-offers.edit') }}" id="add-list"> شگفت انگیز </a>
                             </li> --}}
 
-                            <li class="nav-item {{ request()->routeIs('coupons.index') ? 'activeLi' : '' }}">
+                            {{-- <li class="nav-item {{ request()->routeIs('coupons.index') ? 'activeLi' : '' }}">
                                 <a class="nav-link {{ request()->routeIs('coupons.index') ? 'active1' : '' }}"
                                     href="{{ route('coupons.index') }}" id="add-list"> کدتخفیف </a>
-                            </li>
+                            </li> --}}
 
 
                         </ul>

@@ -34,7 +34,7 @@
                     <div class="menu-icon">
                         <i class="fas fa-handshake"></i>
                     </div>
-                    <div class="menu-text">درخواست همکاری </div>
+                    <a href="/cooperation" class="menu-text">درخواست همکاری </a>
                     <div class="menu-arrow">
                         <i class="bi bi-chevron-left"></i>
                     </div>
@@ -71,16 +71,6 @@
                         <i class="bi bi-chevron-left"></i>
                     </div>
                 </div>
-
-                {{-- <div class="menu-item" data-bs-toggle="modal" data-bs-target="#galleryModal">
-                    <div class="menu-icon">
-                        <i class="bi bi-images"></i>
-                    </div>
-                    <div class="menu-text">گالری تصاویر</div>
-                    <div class="menu-arrow">
-                        <i class="bi bi-chevron-left"></i>
-                    </div>
-                </div> --}}
             </div>
 
             <!-- بخش آخرین نوبت‌های من -->
@@ -98,40 +88,11 @@
                             </div>
                             <div class="appointment-date">
                                 <div>{{ Jdate($reservation->start_at)->format('%B %d، %Y H:i') }}</div>
-                                {{-- <div>۱۰:۳۰</div> --}}
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
-
-            <!-- بخش خدمات مخصوص شما -->
-            {{-- <div class="special-services fade-in">
-                <div class="section-title">
-                    <i class="bi bi-star"></i>
-                    خدمات مخصوص شما
-                </div>
-                <div class="section-content">
-                    <div class="service-item">
-                        <div class="service-icon">
-                            <i class="bi bi-scissors"></i>
-                        </div>
-                        <div class="service-details">
-                            <h5>کوتاهی و استایل مو</h5>
-                            <p>تخفیف ۲۰٪ برای شما</p>
-                        </div>
-                    </div>
-                    <div class="service-item">
-                        <div class="service-icon">
-                            <i class="bi bi-palette"></i>
-                        </div>
-                        <div class="service-details">
-                            <h5>رنگ موی ویژه</h5>
-                            <p>محصولات اورجینال</p>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
 
             <!-- سوالات متداول -->
             <div class="faq-section fade-in">
@@ -207,46 +168,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="cooperateModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileModalLabel">درخواست همکاری </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editProfileForm" action="{{ route('profile.update') }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">نام و نام خانوادگی</label>
-                            <input type="text" class="form-control" name="name" id="fullName"
-                                value="{{ Auth::user()->name }}">
-                            @error('name')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">شماره موبایل</label>
-                            <input type="tel" class="form-control" name="mobile" id="phone"
-                                value="{{ Auth::user()->mobile }}">
-                            @error('mobile')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="birthDate" class="form-label">تاریخ تولد</label>
-                            <input type="text" class="form-control" name="birthDate" id="birthDate"
-                                placeholder="1404/01/11" value="{{ Auth::user()->birthDate }}">
-                            @error('birthDate')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">ذخیره تغییرات</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{-- ⬇️ محاسبه استان/شهر فعلی کاربر برای پیش‌نمایش توی فرم ویرایش --}}
+    @php
+        $userProvinceId = Auth::user()->city;   // ⬅️ مستقیماً استان ذخیره‌شده
+        $userCityId     = Auth::user()->city2;  // ⬅️ مستقیماً شهر ذخیره‌شده
+    @endphp
 
     <!-- مودال ویرایش پروفایل -->
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
@@ -283,6 +209,34 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="provinceSelect" class="form-label">استان محل سکونت</label>
+                            <select name="city" id="provinceSelect" class="form-select">
+                                <option value="">انتخاب استان</option>
+                                @foreach ($cities as $city)
+                                    <option value="{{ $city->id }}"
+                                        {{ $userProvinceId == $city->id ? 'selected' : '' }}>
+                                        {{ $city->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('province_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="citySelect" class="form-label">شهر محل سکونت</label>
+                            <select id="citySelect" class="form-select" name="city2"
+                                {{ $userProvinceId ? '' : 'disabled' }}>
+                                <option value="">ابتدا استان را انتخاب کنید</option>
+                            </select>
+                            @error('city_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <button type="submit" class="btn btn-primary w-100">ذخیره تغییرات</button>
                     </form>
                 </div>
@@ -479,8 +433,81 @@
         </div>
     </div>
 @endsection
+
+{{-- ⬇️ همه‌ی اسکریپت‌ها یکجا، توی یک @section('scripts') --}}
 @section('scripts')
     <script>
+        // مقادیر اولیه‌ی استان/شهر کاربر (برای پیش‌نمایش در فرم ویرایش)
+        const initialProvinceId = @json($userProvinceId);
+        const initialCityId = @json($userCityId);
+
+        function loadCities(provinceId, selectedCityId = null) {
+            const citySelect = $('#citySelect');
+            citySelect.empty();
+
+            if (!provinceId) {
+                citySelect.append('<option value="">ابتدا استان را انتخاب کنید</option>');
+                citySelect.prop('disabled', true);
+                return;
+            }
+
+            citySelect.prop('disabled', true);
+            citySelect.append('<option value="">در حال بارگذاری...</option>');
+
+            $.ajax({
+                url: '/api/cities/by-province/' + provinceId,
+                method: 'GET',
+                success: function (response) {
+                    citySelect.empty();
+                    citySelect.append('<option value="">انتخاب شهر</option>');
+
+                    response.data.forEach(function (city) {
+                        const isSelected = (selectedCityId && city.id == selectedCityId) ? 'selected' : '';
+                        citySelect.append(`<option value="${city.id}" ${isSelected}>${city.title}</option>`);
+                    });
+
+                    citySelect.prop('disabled', false);
+                },
+                error: function () {
+                    citySelect.empty();
+                    citySelect.append('<option value="">خطا در دریافت شهرها</option>');
+                }
+            });
+        }
+
+        // وقتی کاربر دستی استان رو عوض کنه
+        $(document).on('change', '#provinceSelect', function () {
+            loadCities($(this).val());
+        });
+
+        // موقع لود صفحه، اگه مقدار قبلی وجود داشت، خودکار پر کن
+        $(document).ready(function () {
+            if (initialProvinceId) {
+                loadCities(initialProvinceId, initialCityId);
+            }
+        });
+
+        // فرمت کردن مبلغ کیف پول
+        const amountInput = document.getElementById('customAmount');
+        if (amountInput) {
+            amountInput.addEventListener('input', function (e) {
+                // تبدیل اعداد فارسی به انگلیسی
+                let value = e.target.value.replace(/[۰-۹]/g, function (d) {
+                    return String.fromCharCode(d.charCodeAt(0) - 1728);
+                });
+
+                // حذف هر چیزی غیر از عدد
+                value = value.replace(/\D/g, '');
+
+                // جدا کردن سه رقم سه رقم
+                if (value) {
+                    value = Number(value).toLocaleString('en-US');
+                }
+
+                e.target.value = value;
+            });
+        }
+
         $(document).ready(function() {
             // مدیریت باز و بسته شدن سوالات متداول
             $('.faq-question').click(function() {

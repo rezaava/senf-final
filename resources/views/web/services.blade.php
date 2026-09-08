@@ -40,6 +40,54 @@
         .offcanvas {
             background-color: var(--color-surface);
         }
+
+        .special-offer {
+            width: 100%;
+            padding: 0;
+            margin: 0 0 1rem 0 !important;
+        }
+
+        .special-offer {
+    width: 100%;
+    margin: 0 0 1rem 0 !important;
+    padding: 0;
+}
+
+.special-offer {
+    width: 100%;
+    margin: 0 !important;
+    padding: 0;
+}
+
+#slider {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border-radius: 18px;
+}
+
+#slider .splide__track,
+#slider .splide__list {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#slider .splide__slide {
+    height: 100px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    background-color: #000; /* یا هر رنگی که با پس‌زمینه عکس‌هاتون ست باشه */
+}
+
+#slider .slider-img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+}
     </style>
     <link rel="stylesheet" href="{{ asset('asset/css/search.css') }}">
 @endsection
@@ -47,12 +95,29 @@
     <div class="container py-4 px-2" style="min-height: 100dvh">
 
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-3 bg-white p-3 rounded-4 shadow-sm">
-            <ol class="breadcrumb m-0">
+        <nav aria-label="breadcrumb" class="mb-3 bg-dark shadow-sm p-0" style="border-radius: 18px;">
+            {{-- <ol class="breadcrumb m-0">
                 <li class="breadcrumb-item"><a href="/">خانه</a></li>
                 <li class="breadcrumb-item">خدمات</li>
                 <li class="breadcrumb-item active">{{ $category->name }}</li>
-            </ol>
+            </ol> --}}
+            @if ($sliders?->count() > 0)
+                <div class="special-offer d-flex align-items-center justify-content-center mb-3">
+                    <div class="splide" id="slider" role="group" aria-label="Splide Basic HTML Example">
+                        <div class="splide__track">
+                            <ul class="splide__list">
+                                @foreach ($sliders as $slider)
+                                    <li class="splide__slide" >
+                                        <a href="{{ $slider->link }}">
+                                            <img src="{{ asset($slider->image) }}" class="w-100 rounded-4 slider-img" alt="{{ $slider->title }}">
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </nav>
 
         <!-- Filters and sort -->
@@ -224,4 +289,71 @@
 
 @endsection
 @section('scripts')
+<script>
+    // مدیریت تب‌ها
+    $(".tab").on("click", function() {
+        const tabId = $(this).data("tab");
+        $(".tab").removeClass("active");
+        $(this).addClass("active");
+        $(".tab-pane").removeClass("active");
+        $(`#${tabId}`).addClass("active");
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var splide = new Splide('#slider', {
+            type: 'loop',
+            perPage: 1,
+            gap: '10px',
+            pagination: false,
+            autoplay: true,
+            interval: 2000,
+            arrows: false,
+            direction: 'rtl',
+        });
+        splide.mount();
+    });
+    new Splide('#tops-slider', {
+        perPage: 2,
+        gap: '1rem',
+        arrows: false,
+        pagination: false,
+        drag: true,
+        direction: 'rtl',
+        padding: {
+            left: '1rem',
+            right: '0'
+        },
+        breakpoints: {
+            768: {
+                perPage: 2,
+            },
+            480: {
+                perPage: 2,
+                padding: {
+                    left: '1rem',
+                    right: '0'
+                },
+            }
+        }
+    }).mount();
+    new Splide('#product-slider', {
+        perPage: 1,
+        gap: '1rem',
+        arrows: false,
+        pagination: false,
+        drag: true,
+        direction: 'rtl',
+        padding: {
+            left: '8rem',
+            right: '0'
+        },
+        breakpoints: {
+            768: {
+                perPage: 2.2,
+            },
+            480: {
+                perPage: 1,
+            }
+        }
+    }).mount();
+</script>
 @endsection
