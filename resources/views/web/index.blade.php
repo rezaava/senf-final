@@ -35,10 +35,13 @@
     </style>
 @endsection
 @section('content')
+<<<<<<< HEAD
 <div class="overlay position-absolute" id="loader">
             <img id="img" class="w-50" src="{{ asset('images/logo.png') }}" alt="logo">
 </div>
 
+=======
+>>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
     
     <div class="container">
         <div class="header-main mb-3">

@@ -18,7 +18,11 @@ class SiteController extends Controller
     public function home()
     {
         $sliders = Slider::where('status', 1)->where('type' , 1)->get();
+<<<<<<< HEAD
         $categories = Category::whereNull('parent_id')->get();
+=======
+        $categories = Category::all();
+>>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
         $top_operators = User::take(5)->whereHasRole('operator')->get();
         $top_organs = Organ::where('status', 1)->take(5)->get();
         $cities = City::where('parent', null)->get();

@@ -38,7 +38,11 @@
                             <tr>
                                 <td class="align-middle">{{ $key + 1 }}</td>
                                 <td class="align-middle">{{ $organ->name }}</td>
+<<<<<<< HEAD
                                 <td class="align-middle">{{ $organ->city->title}}</td>
+=======
+                                <td class="align-middle">{{ $organ->city }}</td>
+>>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
                                 <td class="align-middle">{{ $organ->Manager->name ?? '' }}</td>
                                 @if ($organ->status == 1)
                                     <td class="align-middle text-success">فعال</td>

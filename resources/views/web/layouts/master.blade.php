@@ -28,7 +28,38 @@
     @yield('head')
 
     <style>
+<<<<<<< HEAD
        
+=======
+        body{
+            overflow: hidden;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 28rem;
+            height: 100vh;
+            background: #C79493;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .overlay img {
+            animation: logoAnimation 1.5s infinite ease-in-out;
+        }
+>>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
 
         @keyframes logoAnimation {
             0% {
@@ -52,7 +83,13 @@
 
 <body >
     <div class="container main-container pb-5 position-relative" style="max-width: 28rem;background: url({{ asset('asset/images/back3.jpg') }}) no-repeat center center;min-height: 100dvh;">
+<<<<<<< HEAD
        
+=======
+        <div class="overlay position-absolute" id="loader">
+            <img id="img" class="w-50" src="{{ asset('images/logo.png') }}" alt="logo">
+        </div>
+>>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
 
         @yield('content')
 
@@ -119,6 +156,26 @@
     <script src="{{ asset('asset/js/main.js') }}"></script>
     <script src="https://lib.arvancloud.ir/sweetalert2/9.17.4/sweetalert2.all.js"></script>
 
+<<<<<<< HEAD
+=======
+        <script>
+            window.addEventListener("load", function () {
+                let loader = document.querySelector('#loader');
+                let img = document.querySelector('#img');
+                document.body.style.overflow = "hidden";
+
+                setTimeout(() => {
+                    loader.classList.add("hide");
+                    document.body.style.overflow = "auto";
+                    setTimeout(() => {
+                        loader.remove();
+                    }, 800);
+
+                }, 1000);
+
+            });
+        </script>
+>>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
 
     @if (Session::has('success'))
         <script>

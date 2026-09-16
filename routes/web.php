@@ -143,7 +143,7 @@ Route::delete('/cart/remove/{reservation}', [CartController::class, 'remove'])->
 
 Route::middleware(['auth' , 'role:admin|manager|operator|user' ])->get('/cooperation', [RequestController::class, 'cooperation'])->name('cooperation');
 
-Route::middleware(['auth' , 'role:admin|manager|operator' ])->group(function () {
+Route::middleware(['auth' , 'role:admin|manager|operator|user' ])->group(function () {
     // dashboard pages ==================================================================================================================
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('index');
     Route::post('/organStore', [RequestController::class, 'organStore'])->name('organStore');
