@@ -34,6 +34,7 @@ class SliderController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'link' => ['nullable', 'url'],
             'status' => ['required', 'boolean'],
+            'type' => ['required'],
             'image' => ['required', 'image', 'max:2048'],
         ]);
         if ($request->hasFile('image')) {

@@ -52,6 +52,16 @@
                     @enderror
                 </div>
 
+                <div class="mb-3">
+                    <label for="type" class="form-label">محل انتخاب نمایش</label>
+                    <select name="type" id="type" class="form-control">
+                        <option value="">انتخاب کنید</option>
+                        <option value="1" {{ $slider->type ? 'selected' : '' }}>صفحه اصلی</option>
+                        <option value="2" {{ $slider->type ? 'selected' : '' }}>تبلیغات</option>
+                    </select>
+                    @error('type') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+
                 <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
             </form>
         </div>

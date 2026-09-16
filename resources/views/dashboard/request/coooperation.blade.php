@@ -15,6 +15,8 @@
 @endsection
 
 @section('body')
+
+
     <!-- main  -->
     <div class="col px-3">
         {{-- @if ($errors->any())
@@ -29,7 +31,7 @@
             <div class="clearfix mt-2">
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
                     <h5 class="float-end">درخواست همکاری</h5>
-                    <a href="/dashboard/coupons" class="btn btn-outline-danger">انصراف</a>
+                    <a href="/profile" class="btn btn-outline-danger">انصراف</a>
                 </div>
             </div>
             <form action="{{ route('organ.store') }}" class="px-4 mt-4" method="POST" enctype="multipart/form-data">

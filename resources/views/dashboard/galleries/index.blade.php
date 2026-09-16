@@ -11,22 +11,23 @@
         </div>
         
         @foreach($galleries as $gallery)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5>{{ $gallery->title }}</h5>
-                    <p>{{ $gallery->description }}</p>
-                    @if($gallery->type === 'image')
-                        <img src="{{ asset($gallery->path) }}" class="img-fluid" style="max-width: 300px;">
-                    @else
-                        <video controls style="max-width: 300px;">
-                            <source src="{{ asset($gallery->path) }}" type="video/mp4">
-                        </video>
-                    @endif
-
-                    <form action="{{ route('galleries.destroy', $gallery->id) }}" method="POST" class="mt-2">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-danger btn-sm">حذف</button>
-                    </form>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>{{ $gallery->title }}</h5>
+                        <p>{{ $gallery->description }}</p>
+                        @if($gallery->type === 'image')
+                            <img src="{{ asset($gallery->path) }}"  style="width:100%;object-fit:cover;">
+                        @else
+                            <video controls style="width:100%; max-width:300px;">
+                                <source src="{{ asset($gallery->path) }}" type="video/mp4">
+                            </video>
+                        @endif
+                        <form action="{{ route('galleries.destroy', $gallery->id) }}" method="POST" class="mt-2">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-danger btn-sm">حذف</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         @endforeach

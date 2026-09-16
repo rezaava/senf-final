@@ -2,8 +2,44 @@
 @section('head')
     <link rel="stylesheet" href="{{ asset('asset/css/notification.css') }}">
     <script src="{{ asset('asset/js/notification.js') }}"></script>
+
+    <style>
+          body{
+            overflow: hidden;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 28rem;
+            height: 100vh;
+            background: #C79493;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .overlay img {
+            animation: logoAnimation 1.5s infinite ease-in-out;
+        }
+    </style>
 @endsection
 @section('content')
+<div class="overlay position-absolute" id="loader">
+            <img id="img" class="w-50" src="{{ asset('images/logo.png') }}" alt="logo">
+</div>
+
+    
     <div class="container">
         <div class="header-main mb-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -76,7 +112,7 @@
         <!-- start adds -->
         <!-- end adds -->
         <!-- start search section -->
-        <div class="search-container mb-3">
+    {{--     <div class="search-container mb-3">
             <div class="tabs pt-3">
                 <div class="tab d-flex flex-column gap-2" data-tab="salons">
                     <i class="fas fa-shop"></i>
@@ -129,7 +165,7 @@
 
                 </div>
             </div>
-        </div>
+        </div>  --}}
         <!-- end search section -->
 
         <!-- some organs -->
@@ -265,6 +301,25 @@
     </div>
 @endsection
 @section('scripts')
+
+<script>
+            window.addEventListener("load", function () {
+                let loader = document.querySelector('#loader');
+                let img = document.querySelector('#img');
+                document.body.style.overflow = "hidden";
+
+                setTimeout(() => {
+                    loader.classList.add("hide");
+                    document.body.style.overflow = "auto";
+                    setTimeout(() => {
+                        loader.remove();
+                    }, 800);
+
+                }, 1000);
+
+            });
+</script>
+
     <script>
         // مدیریت تب‌ها
         $(".tab").on("click", function() {

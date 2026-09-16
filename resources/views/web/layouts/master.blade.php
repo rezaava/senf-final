@@ -26,11 +26,34 @@
     <link rel="stylesheet" href="{{ asset('asset/css/splide.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/inputs.css') }}">
     @yield('head')
+
+    <style>
+       
+
+        @keyframes logoAnimation {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+        
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        
+            100% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+        }
+
+    </style>
 </head>
 
-<body>
-    <div class="container main-container pb-5 position-relative"
-        style="max-width: 28rem;background: url({{ asset('asset/images/back3.jpg') }}) no-repeat center center;min-height: 100dvh;">
+<body >
+    <div class="container main-container pb-5 position-relative" style="max-width: 28rem;background: url({{ asset('asset/images/back3.jpg') }}) no-repeat center center;min-height: 100dvh;">
+       
+
         @yield('content')
 
         <!-- Bottom Navigation Bar -->
@@ -95,6 +118,8 @@
     <script src="{{ asset('asset/js/inputs.js') }}"></script>
     <script src="{{ asset('asset/js/main.js') }}"></script>
     <script src="https://lib.arvancloud.ir/sweetalert2/9.17.4/sweetalert2.all.js"></script>
+
+
     @if (Session::has('success'))
         <script>
             Swal.fire({

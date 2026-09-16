@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Organ;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
@@ -17,18 +18,22 @@ class CommentController extends Controller
             'commentable_type' => 'required|string',
             'commentable_id' => 'required|integer',
         ]);
-
-        Comment::create([
-            'name' => auth()->user()->name,
-            'text' => $request->text,
-            'score' => $request->score,
-            'user_id' => auth()->id(),
-            'commentable_type' => $request->commentable_type,
-            'commentable_id' => $request->commentable_id,
-            'is_approved' => false,
+    
+        $comment = new Comment();
+    
+        $comment->name = Auth::user()->name ?? 'بدون نام';
+        $comment->text = $request->text;
+        $comment->score = $request->score;
+        $comment->user_id = Auth::user()->id;
+        $comment->commentable_type = $request->commentable_type;
+        $comment->commentable_id = $request->commentable_id;
+        $comment->is_approved = false;
+    
+        $comment->save();
+    
+        return response()->json([
+            'status' => 'ok'
         ]);
-
-        return response()->json(['status' => 'ok']);
     }
 
     public function index()

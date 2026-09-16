@@ -1,5 +1,6 @@
 @extends('web.layouts.master')
 @section('head')
+    <link rel="stylesheet" href="{{ asset('asset/css/date.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/search.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/leaflet.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/map.css') }}">
@@ -85,9 +86,9 @@
             <!-- مرتب‌سازی و تعداد نتایج -->
             <div class="row">
                 <div class="col-md-12">
-                    <div class="results-count">
+                    {{-- <div class="results-count">
                         <span id="results-count">0</span> نتیجه یافت شد
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="col-md-12">
                     <div class="sort-options">
@@ -111,8 +112,10 @@
     </div>
 @endsection
 @section('scripts')
-    <script src="{{ asset('asset/js/leaflet.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
     <script src="{{ asset('asset/js/persian-datepicker.min.js') }}"></script>
+    <script src="{{ asset('asset/js/leaflet.js') }}"></script>
     <script>
         $(document).ready(function() {
             // تنظیم CSRF Token برای درخواست‌های AJAX
@@ -132,6 +135,11 @@
 
             let currentSort = 'rating';
             let currentPage = 1;
+            let currentTab = 'services';
+            // فلگ برای جلوگیری از اجرای دوباره‌ی جستجوی سرویس‌ها در لود اولیه
+            let initialServiceSearchDone = false;
+            // فلگ برای لود تنبل (lazy) نقشه، فقط وقتی کاربر روی تب نقشه کلیک کرد
+            let mapInitialized = false;
 
             if (tabParam) {
 
@@ -171,10 +179,19 @@
                 searchSalons();
             }
 
-            if (tabParam === 'services') {
+            // جستجوی اولیه سرویس‌ها: چه tab=services باشه چه اصلا پارامتری نباشه (تب پیش‌فرض)
+            // این جایگزینِ فراخوانی تکراریِ searchServices() در انتهای فایل شده تا
+            // دو درخواست AJAX هم‌زمان به سرور ارسال نشه و لود صفحه سریع‌تر بشه
+            if (!tabParam || tabParam === 'services') {
                 searchServices();
+                initialServiceSearchDone = true;
             }
 
+            if (tabParam === 'map') {
+                initMap();
+                setupMapControls();
+                mapInitialized = true;
+            }
 
             // لود دسته‌بندی‌ها و شهرها
             loadCategories();
@@ -189,6 +206,13 @@
 
                 $(".tab-pane").removeClass("active");
                 $(`#${tabId}`).addClass("active");
+
+                // لود تنبل نقشه: فقط اولین باری که کاربر وارد تب نقشه می‌شه ساخته می‌شه
+                if (tabId === 'map' && !mapInitialized) {
+                    initMap();
+                    setupMapControls();
+                    mapInitialized = true;
+                }
 
                 // پاک کردن نتایج قبلی
                 clearResults();
@@ -550,99 +574,96 @@
                 persianDigit: true
             });
 
-            // جستجوی اولیه
-            searchServices();
-        });
-    </script>
+            // نکته: فراخوانی تکراریِ searchServices() که قبلا اینجا بود حذف شد
+            // چون بالاتر، در همان لود اولیه، یک‌بار (و فقط یک‌بار) اجرا می‌شود.
 
-    <script>
-        // کد نقشه (همانند قبل)
-        const salonsNew = []; // این داده‌ها باید از API گرفته شوند
+            // -------------------------------------------------------------
+            // کد نقشه (initMap / setupMapControls) به همین اسکوپ منتقل شده
+            // تا بتونه به متغیرهای بالا (mapInitialized و ...) دسترسی داشته باشه
+            // و به‌صورت lazy فقط با کلیک روی تب «نقشه» اجرا بشه، نه همیشه.
+            // -------------------------------------------------------------
+            const salonsNew = []; // این داده‌ها باید از API گرفته شوند
+            let map;
+            let markers = [];
+            let userLocationIcon; // آیکون نشانگر موقعیت کاربر (رفع باگ متغیر تعریف‌نشده)
 
-        let map;
-        let markers = [];
+            function initMap() {
+                // مختصات مرکز تهران
+                const tehranCoords = [35.6892, 51.3890];
 
-        function initMap() {
-            // مختصات مرکز تهران
-            const tehranCoords = [35.6892, 51.3890];
+                // ایجاد نقشه
+                map = L.map('map').setView(tehranCoords, 12);
 
-            // ایجاد نقشه
-            map = L.map('map').setView(tehranCoords, 12);
+                // اضافه کردن لایه نقشه
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
 
-            // اضافه کردن لایه نقشه
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            // اضافه کردن نشانگر برای هر آرایشگاه
-            salonsNew.forEach(salon => {
-                // ایجاد نشانگر سفارشی
-                const customIcon = L.divIcon({
+                // آیکون سفارشی مشترک برای نشانگرها
+                userLocationIcon = L.divIcon({
                     className: 'custom-marker',
                     html: `<div style="background-color: var(--color-primary); width: 100%; height: 100%; border-radius: 50%;"></div>`,
                     iconSize: [24, 24],
                     iconAnchor: [12, 12]
                 });
 
-                const marker = L.marker([salon.lat, salon.lng], {
-                        icon: customIcon
-                    })
-                    .addTo(map)
-                    .bindPopup(`
-                        <div style="text-align: right; font-family: Vazir, sans-serif;">
-                            <h5 style="color: var(--color-primary); margin: 0 0 5px;">${salon.name}</h5>
-                            <p style="margin: 0 0 5px; font-size: 0.9rem;">${salon.address}</p>
-                            <div style="color: #FFC107; font-size: 0.9rem;">
-                                <i class="fas fa-star"></i> 4.3
+                // اضافه کردن نشانگر برای هر آرایشگاه
+                salonsNew.forEach(salon => {
+                    const marker = L.marker([salon.lat, salon.lng], {
+                            icon: userLocationIcon
+                        })
+                        .addTo(map)
+                        .bindPopup(`
+                            <div style="text-align: right; font-family: Vazir, sans-serif;">
+                                <h5 style="color: var(--color-primary); margin: 0 0 5px;">${salon.name}</h5>
+                                <p style="margin: 0 0 5px; font-size: 0.9rem;">${salon.address}</p>
+                                <div style="color: #FFC107; font-size: 0.9rem;">
+                                    <i class="fas fa-star"></i> 4.3
+                                </div>
                             </div>
-                        </div>
-                    `);
+                        `);
 
-                markers.push({
-                    id: salon.id,
-                    marker: marker
-                });
-            });
-        }
-
-        function setupMapControls() {
-            // بزرگنمایی
-            document.getElementById('zoomInBtn').addEventListener('click', () => {
-                map.zoomIn();
-            });
-
-            // کوچکنمایی
-            document.getElementById('zoomOutBtn').addEventListener('click', () => {
-                map.zoomOut();
-            });
-
-            // موقعیت من
-            document.getElementById('locateBtn').addEventListener('click', () => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(position => {
-                        const userLat = position.coords.latitude;
-                        const userLng = position.coords.longitude;
-                        map.setView([userLat, userLng], 14);
-
-                        // اضافه کردن نشانگر موقعیت کاربر
-                        L.marker([userLat, userLng], {
-                                icon: customIcon
-                            })
-                            .addTo(map)
-                            .bindPopup('موقعیت شما')
-                            .openPopup();
-                    }, () => {
-                        alert('دسترسی به موقعیت مکانی مجاز نیست.');
+                    markers.push({
+                        id: salon.id,
+                        marker: marker
                     });
-                } else {
-                    alert('مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.');
-                }
-            });
-        }
+                });
+            }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initMap();
-            setupMapControls();
+            function setupMapControls() {
+                // بزرگنمایی
+                document.getElementById('zoomInBtn').addEventListener('click', () => {
+                    map.zoomIn();
+                });
+
+                // کوچکنمایی
+                document.getElementById('zoomOutBtn').addEventListener('click', () => {
+                    map.zoomOut();
+                });
+
+                // موقعیت من
+                document.getElementById('locateBtn').addEventListener('click', () => {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(position => {
+                            const userLat = position.coords.latitude;
+                            const userLng = position.coords.longitude;
+                            map.setView([userLat, userLng], 14);
+
+                            // اضافه کردن نشانگر موقعیت کاربر
+                            L.marker([userLat, userLng], {
+                                    icon: userLocationIcon
+                                })
+                                .addTo(map)
+                                .bindPopup('موقعیت شما')
+                                .openPopup();
+                        }, () => {
+                            alert('دسترسی به موقعیت مکانی مجاز نیست.');
+                        });
+                    } else {
+                        alert('مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.');
+                    }
+                });
+            }
         });
     </script>
 @endsection

@@ -17,8 +17,8 @@ class SiteController extends Controller
 {
     public function home()
     {
-        $sliders = Slider::where('status', true)->get();
-        $categories = Category::all();
+        $sliders = Slider::where('status', 1)->where('type' , 1)->get();
+        $categories = Category::whereNull('parent_id')->get();
         $top_operators = User::take(5)->whereHasRole('operator')->get();
         $top_organs = Organ::where('status', 1)->take(5)->get();
         $cities = City::where('parent', null)->get();
@@ -79,7 +79,8 @@ class SiteController extends Controller
         $services = $query->paginate(10)->withQueryString();
 
         $categories = Category::where('parent_id', $category->id)->get();
-        return view('web.services', compact('category', 'services', 'categories'));
+        $sliders = Slider::where('status', 1)->where('type' , 2)->get();
+        return view('web.services', compact('category', 'services', 'categories' , 'sliders'));
     }
 
     public function set_location(Request $request)

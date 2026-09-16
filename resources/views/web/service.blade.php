@@ -27,6 +27,13 @@
         .star.active {
             color: #f5c518;
         }
+        .service-image {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
@@ -72,6 +79,12 @@
         <div class="col-12 px-3">
             <!-- اطلاعات خدمت -->
             <div class="service-info-card shadow-sm border">
+        <a href="{{ route('salon', ['salon' => $service->organ]) }}">
+            <img src="{{ asset($service->image ?? 'images/test.webp') }}"
+            class="service-image" 
+            alt="{{ $service->name }}">
+        </a>
+
                 <p>{{ $service->description }}</p>
 
                 {{-- <h6 class="fw-bold mt-4">ویژگی های خدمت:</h6> --}}
@@ -296,10 +309,16 @@
                         <!-- end categories -->
 
                         <!-- تقویم هفته -->
+                        <!-- تقویم هفته -->
                         <div class="mb-3 week-container d-none" id="weekContainer">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <button class="btn btn-outline-secondary btn-sm" id="prevWeek">‹ هفته قبل</button>
+                                <button class="btn btn-outline-secondary btn-sm" id="prevMonth">‹‹ ماه قبل</button>
                                 <span class="fw-bold" id="monthTitle">مهر</span>
+                                <button class="btn btn-outline-secondary btn-sm" id="nextMonth">ماه بعد ››</button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <button class="btn btn-outline-secondary btn-sm" id="prevWeek">‹ هفته قبل</button>
+                                <span></span>
                                 <button class="btn btn-outline-secondary btn-sm" id="nextWeek">هفته بعد ›</button>
                             </div>
                             <div class="day-slider" id="daySlider"></div>
@@ -321,12 +340,37 @@
                             <p class="mt-2 text-muted">در حال بارگذاری ساعت‌ها...</p>
                         </div>
                     </div>
+
+                                        <!-- مرحله 2: خلاصه رزرو -->
+                    <div class="step-content d-none" id="step2">
+                        <h6 class="text-center mb-4">خلاصه رزرو شما</h6>
+
+                        <div class="summary-box border rounded p-3 bg-light">
+                            <p class="mb-2">
+                                کاربر گرامی، شما در تاریخ
+                                <strong id="summaryDate">-</strong>
+                                ساعت
+                                <strong id="summaryTime">-</strong>
+                                سرویس
+                                <strong id="summaryService">-</strong>
+                                را انتخاب کرده‌اید.
+                            </p>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">مبلغ قابل پرداخت:</span>
+                                <span class="fw-bold text-success">
+                                    <strong id="summaryPrice">-</strong> تومان
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer bg-white sticky-bottom">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
                     <button type="button" class="btn btn-outline-primary d-none" id="prevStep">مرحله قبل</button>
-                    <button type="button" class="btn btn-primary {{ $service->price_max ? '' : 'd-none' }}" id="nextStep">مرحله بعد</button>
-                    <button type="button" class="btn btn-success {{ $service->price_max ? 'd-none' : '' }}" id="confirmReserve">رزور نوبت  </button>
+                    <button type="button" class="btn btn-primary" id="nextStep">مرحله بعد</button>
+                    <button type="button" class="btn btn-success d-none" id="confirmReserve">رزرو نوبت</button>
                 </div>
             </div>
         </div>
@@ -339,6 +383,8 @@
     <script>
         const serviceHasPriceRange = @json(!is_null($service->price_max));
         service_name = "{{ $service->name }}";
+        const servicePrice = {{ $service->price }};
+        const servicePriceMax = {{ $service->price_max ?? 0 }};
         $(document).ready(function() {
             // فرض کنید service_id از جایی گرفته می‌شود
             reservationState.service_id = {{ $service->id }}; // این مقدار باید از صفحه اصلی گرفته شود

@@ -38,7 +38,7 @@
                             <tr>
                                 <td class="align-middle">{{ $key + 1 }}</td>
                                 <td class="align-middle">{{ $organ->name }}</td>
-                                <td class="align-middle">{{ $organ->city->title }}</td>
+                                <td class="align-middle">{{ $organ->city->title}}</td>
                                 <td class="align-middle">{{ $organ->Manager->name ?? '' }}</td>
                                 @if ($organ->status == 1)
                                     <td class="align-middle text-success">فعال</td>

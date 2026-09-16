@@ -128,6 +128,61 @@ function toPersianDate(gDate) {
     };
 }
 
+// ⬅️ جدید: تبدیل تاریخ شمسی به میلادی (معکوس toPersianDate)
+function toGregorianDate(jy, jm, jd) {
+    const j_days_in_month = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+    const g_days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    let jy2 = jy - 979;
+
+    let j_day_no =
+        365 * jy2 +
+        Math.floor(jy2 / 33) * 8 +
+        Math.floor(((jy2 % 33) + 3) / 4);
+
+    for (let i = 0; i < jm - 1; ++i) j_day_no += j_days_in_month[i];
+    j_day_no += jd - 1;
+
+    let g_day_no = j_day_no + 79;
+
+    let gy = 1600 + 400 * Math.floor(g_day_no / 146097);
+    g_day_no = g_day_no % 146097;
+
+    let leap = true;
+    if (g_day_no >= 36525) {
+        g_day_no--;
+        gy += 100 * Math.floor(g_day_no / 36524);
+        g_day_no = g_day_no % 36524;
+
+        if (g_day_no >= 365) g_day_no++;
+        else leap = false;
+    }
+
+    gy += 4 * Math.floor(g_day_no / 1461);
+    g_day_no %= 1461;
+
+    if (g_day_no >= 366) {
+        leap = false;
+        g_day_no--;
+        gy += Math.floor(g_day_no / 365);
+        g_day_no = g_day_no % 365;
+    }
+
+    let gd = g_day_no + 1;
+    const isLeapG = (gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0;
+    const gDaysInMonth = g_days_in_month.slice();
+    gDaysInMonth[1] = isLeapG ? 29 : 28;
+
+    let gm = 0;
+    while (gm < 12 && gd > gDaysInMonth[gm]) {
+        gd -= gDaysInMonth[gm];
+        gm++;
+    }
+    gm += 1;
+
+    return new Date(gy, gm - 1, gd);
+}
+
 function getStartOfWeek(date) {
     const d = new Date(date);
     const jsDay = d.getDay(); // 0=Sunday ... 6=Saturday
@@ -177,12 +232,28 @@ function renderStylists(stylists) {
     const container = $("#stylistsList");
     container.empty();
 
+    if (window.splideInstance) {
+        window.splideInstance.destroy();
+        window.splideInstance = null;
+    }
+
     if (!stylists || stylists.length === 0) {
         container.html(
-            '<li class="text-center text-muted">آرایشگری یافت نشد</li>',
+            '<li class="text-center text-muted w-100 py-3">اپراتوری وجود ندارد</li>'
         );
+
+        // چون آرایشگری برای انتخاب نیست، بقیه مراحل رو مخفی/غیرفعال کن
+        $("#weekContainer").addClass("d-none");
+        $("#daySlider").empty();
+        $("#timeSlots").html(
+            '<p class="text-muted text-center w-100">اپراتوری وجود ندارد</p>'
+        );
+        $("#nextStep").prop("disabled", true);
+
         return;
     }
+
+    $("#nextStep").prop("disabled", false);
 
     stylists.forEach((stylist) => {
         container.append(`
@@ -204,10 +275,6 @@ function renderStylists(stylists) {
         `);
     });
 
-    // ری‌اینیشیالایز Splide اگر لازم است
-    if (window.splideInstance) {
-        window.splideInstance.destroy();
-    }
     window.splideInstance = new Splide("#categories").mount();
 }
 
@@ -280,6 +347,10 @@ function renderWeek(date) {
             </div>
         `);
     }
+
+    // ⬅️ جدید: عنوان ماه رو هم اینجا آپدیت کنیم تا با تغییر ماه/هفته هماهنگ بمونه
+    const titleDate = toPersianDate(date);
+    $("#monthTitle").text(titleDate.monthName);
 }
 
 // ===========================
@@ -349,6 +420,35 @@ function renderSlots(slots) {
     });
 }
 
+
+function fillSummary() {
+   
+    if (reservationState.date) {
+        const dateObj = new Date(reservationState.date + "T00:00:00");
+        const persianDate = toPersianDate(dateObj);
+        const persianDayIndex = (dateObj.getDay() + 1) % 7;
+        $("#summaryDate").text(
+            `${dayNames[persianDayIndex]}، ${persianDate.day} ${persianDate.monthName} ${persianDate.year}`
+        );
+    }
+
+    
+    if (reservationState.slot && reservationState.slot.start_at) {
+        const start = reservationState.slot.start_at.substring(11, 16);
+        const end = reservationState.slot.end_at.substring(11, 16);
+        $("#summaryTime").text(`${start} - ${end}`);
+    }
+
+    
+    $("#summaryService").text(service_name);
+
+    
+    let priceText = Number(servicePrice).toLocaleString("fa-IR");
+    if (servicePriceMax && servicePriceMax > 0) {
+        priceText += " تا " + Number(servicePriceMax).toLocaleString("fa-IR");
+    }
+    $("#summaryPrice").text(priceText);
+}
 // ===========================
 // 📌 رویدادهای کلیک
 // ===========================
@@ -434,6 +534,41 @@ $("#nextWeek").click(function () {
     }
 });
 
+// ⬅️ جدید: رفتن به ماه قبل/بعد (روز اول همان ماه شمسی)
+function goToMonth(offset) {
+    const persianDate = toPersianDate(currentDate);
+    let jy = persianDate.year;
+    let jm = persianDate.month + offset;
+
+    if (jm > 12) {
+        jm = 1;
+        jy++;
+    } else if (jm < 1) {
+        jm = 12;
+        jy--;
+    }
+
+    // روز اول ماه (شمسی) -> تبدیل به میلادی
+    currentDate = toGregorianDate(jy, jm, 1);
+
+    if (reservationState.operator_id) {
+        loadAvailableDays(
+            reservationState.operator_id,
+            reservationState.service_id,
+        );
+    } else {
+        renderWeek(currentDate);
+    }
+}
+
+$("#prevMonth").click(function () {
+    goToMonth(-1);
+});
+
+$("#nextMonth").click(function () {
+    goToMonth(1);
+});
+
 // ===========================
 // 📌 مدیریت مراحل
 // ===========================
@@ -473,8 +608,12 @@ function goToNextStep() {
 
     currentStep++;
 
-    if (!serviceHasPriceRange && currentStep === 2) {
-        currentStep = 3;
+    // if (!serviceHasPriceRange && currentStep === 2) {
+    //     currentStep = 3;
+    // }
+
+    if (currentStep === 2) {
+        fillSummary();
     }
 
     $("#step" + currentStep).removeClass("d-none");
@@ -528,73 +667,6 @@ function updateStepIndicator() {
 }
 
 // ===========================
-// 📌 آپلود عکس
-// ===========================
-// const uploadArea = document.getElementById("uploadArea");
-// const imageInput = document.getElementById("imageUpload");
-// const previewImage = document.getElementById("previewImage");
-
-// uploadArea.addEventListener("click", () => {
-//     imageInput.value = "";
-//     imageInput.click();
-// });
-
-// imageInput.addEventListener("change", (e) => {
-//     const file = e.target.files[0];
-//     if (file) handleFile(file);
-// });
-
-// uploadArea.addEventListener("dragover", (e) => {
-//     e.preventDefault();
-//     uploadArea.classList.add("dragover");
-// });
-
-// uploadArea.addEventListener("dragleave", (e) => {
-//     e.preventDefault();
-//     uploadArea.classList.remove("dragover");
-// });
-
-// uploadArea.addEventListener("drop", (e) => {
-//     e.preventDefault();
-//     uploadArea.classList.remove("dragover");
-//     const file = e.dataTransfer.files[0];
-//     if (file) handleFile(file);
-// });
-
-// function handleFile(file) {
-//     if (file.size > 5 * 1024 * 1024) {
-//         alert("حجم فایل نباید بیشتر از 5MB باشد.");
-//         return;
-//     }
-
-//     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-//     if (!validTypes.includes(file.type)) {
-//         alert("فقط فایل‌های JPG و PNG مجاز هستند.");
-//         return;
-//     }
-
-//     const reader = new FileReader();
-//     reader.onload = (e) => {
-//         previewImage.src = e.target.result;
-//         previewImage.style.display = "block";
-//         uploadArea.classList.add("active");
-//         uploadArea.querySelector("h5").textContent = "عکس با موفقیت آپلود شد";
-//         uploadArea.querySelector("p").textContent =
-//             "برای تغییر عکس، کلیک یا درگ مجدد کنید";
-//     };
-//     reader.readAsDataURL(file);
-// }
-
-// ===========================
-// 📌 انتخاب روش پرداخت
-// ===========================
-// $(document).on("click", ".payment-option", function () {
-//     $(".payment-option").removeClass("active");
-//     $(this).addClass("active");
-//     selectedPaymentMethod = $(this).data("method");
-// });
-
-// ===========================
 // 📌 تایید نهایی رزرو
 // ===========================
 $("#confirmReserve").click(function () {
@@ -609,11 +681,6 @@ $("#confirmReserve").click(function () {
     formData.append("end_at", reservationState.slot.end_at);
     formData.append("payment_method", selectedPaymentMethod);
 
-    // عکس مرجع اگر آپلود شده باشه
-    // const file = imageInput.files[0];
-    // if (file) {
-    //     formData.append("reference_image", file);
-    // }
     const token = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
@@ -713,31 +780,27 @@ $(document).ready(function () {
     // renderWeek(currentDate);
 });
 
-$("#reservationModal").on("hidden.bs.modal", function () {
-    resetForm();
-});
-
 document.getElementById('confirmReserve').addEventListener('click', function () {
 
     Swal.fire({
         icon: 'success',
         title: 'رزرو با موفقیت انجام شد',
         text: 'نوبت شما با موفقیت رزرو گردید.',
-        confirmButtonText: 'ادامه می‌دهم',
+        confirmButtonText: 'پرداخت می کنم',
         showCancelButton: true,
         cancelButtonText: 'مشاهده نوبت‌های رزرو شده'
     }).then((result) => {
-            
+
         if (result.isConfirmed) {
             $("#reservationModal").modal("hide");
              resetForm();
         }
-            
+
         if (result.dismiss === Swal.DismissReason.cancel) {
             // رفتن به صفحه نوبت‌های رزرو شده
             window.location.href = '/cart';
         }
-            
+
     });
 
 });

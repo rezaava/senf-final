@@ -17,6 +17,7 @@
                             <th>عنوان</th>
                             <th>تصویر</th>
                             <th>لینک</th>
+                            <th>محل نمایش</th>
                             <th>وضعیت</th>
                             <th>عملیات</th>
                         </tr>
@@ -27,6 +28,7 @@
                                 <td>{{ $slider->title }}</td>
                                 <td><img src="{{ asset($slider->image) }}" alt="" width="100"></td>
                                 <td>{{ $slider->link ?? '-' }}</td>
+                                <td>{{ $slider->type == 1 ? 'صفحه اصلی' : 'تبلیغات' }}</td>
                                 <td>{{ $slider->status ? 'فعال' : 'غیرفعال' }}</td>
                                 <td>
                                     <a href="{{ route('sliders.edit', $slider) }}" class="btn btn-warning btn-sm">ویرایش</a>

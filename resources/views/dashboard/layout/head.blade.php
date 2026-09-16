@@ -73,13 +73,13 @@
         --scroll-width: 10px;
     }
 
-        @font-face {
+       @font-face {
             font-family: dana;
-            src: url({{asset('fonts/DanaFaNum-Medium.ttf')}});
+            src: url({{asset('fonts/woff/IRANSansXFaNum-regular.woff')}});
         }
         @font-face {
             font-family: dana-lg;
-            src: url({{asset('fonts/Dana-Black.woff')}});
+            src: url({{asset('fonts/woff/IRANSansXFaNum-black.woff')}});
         }
 
         .header {
@@ -454,13 +454,13 @@
                 font-size: 1.3rem;
                 padding: 6px 10px;
                 border-radius: 12px;
-                position: fixed;
+                /* position: fixed;
                 top: 36px;
                 right: 36px;
-                z-index: 2100;
+                z-index: 2100; */
                 box-shadow: 0 2px 8px 0 #0002;
                 transition: all 0.2s;
-                margin-top: 1rem;
+                /* margin-top: 1rem; */
             }
             .mobile-menu-btn:hover {
                 background: var(--accent-green);
