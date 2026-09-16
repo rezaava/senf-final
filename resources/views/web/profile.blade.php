@@ -1,6 +1,8 @@
 @extends('web.layouts.master')
 @section('head')
     <link rel="stylesheet" href="{{ asset('asset/css/profile.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/css/salon-select.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 @section('content')
     <div class="container p-0" style="max-width: 28rem;">
@@ -14,6 +16,24 @@
 
             <div class="profile-name">{{ Auth::user()->name }}</div>
             <div class="profile-phone">{{ Auth::user()->mobile }}</div>
+
+            {{-- سالن فعال کاربر + امکان تغییر آن در صورت عضویت در چند سالن --}}
+            @if ($currentSalon)
+                <div class="profile-salon">
+                    <span class="profile-salon-badge">
+                        <i class="bi bi-shop"></i>
+                        <span id="currentSalonName">{{ $currentSalon['name'] }}</span>
+                    </span>
+
+                    @if ($canSwitchSalon)
+                        <button type="button" class="salon-switch-btn" data-bs-toggle="modal"
+                            data-bs-target="#switchSalonModal">
+                            <i class="bi bi-arrow-left-right"></i>
+                            تغییر سالن
+                        </button>
+                    @endif
+                </div>
+            @endif
         </div>
 
         <!-- محتوای پروفایل -->
@@ -244,6 +264,46 @@
         </div>
     </div>
 
+    @if ($canSwitchSalon)
+        <!-- مودال تغییر سالن -->
+        <div class="modal fade" id="switchSalonModal" tabindex="-1" aria-labelledby="switchSalonModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="switchSalonModalLabel">تغییر سالن</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body salon-step">
+                        <p class="salon-switch-hint">
+                            سالنی که می‌خواهید در آن کار کنید را انتخاب کنید.
+                        </p>
+
+                        <div class="salon-search is-hidden" id="switchSalonSearchBox">
+                            <i class="bi bi-search salon-search-icon"></i>
+                            <input type="text" id="switchSalonSearchInput"
+                                placeholder="جست‌وجوی نام یا آدرس سالن..." autocomplete="off">
+                        </div>
+
+                        <div class="salon-cards" id="switchSalonCards" role="radiogroup"
+                            aria-label="لیست سالن‌ها"></div>
+
+                        <div class="salon-empty is-hidden" id="switchSalonEmptyState">
+                            <i class="bi bi-shop-window"></i>
+                            <span id="switchSalonEmptyText">سالنی یافت نشد</span>
+                        </div>
+
+                        <button type="button" class="salon-submit-btn" id="confirmSwitchSalonBtn" disabled>
+                            ثبت و تغییر سالن
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @include('partials.salon-card-template')
+    @endif
+
     <!-- مودال نوبت‌های من -->
     <div class="modal fade" id="appointmentsModal" tabindex="-1" aria-labelledby="appointmentsModalLabel"
         aria-hidden="true">
@@ -436,6 +496,84 @@
 
 {{-- ⬇️ همه‌ی اسکریپت‌ها یکجا، توی یک @section('scripts') --}}
 @section('scripts')
+    @if ($canSwitchSalon)
+        <script src="{{ asset('asset/js/salon-picker.js') }}"></script>
+        <script>
+            // ---------------------------------------------------------------
+            // مودال «تغییر سالن»
+            // از همان ویجت مشترک صفحه‌ی ورود استفاده می‌کند
+            // (asset/js/salon-picker.js + partials/salon-card-template)
+            // ---------------------------------------------------------------
+            $(function() {
+                const salons = @json($salons);
+                const currentSalonId = (salons.find(s => s.is_current) || {}).id;
+
+                const picker = SalonPicker({
+                    cards: '#switchSalonCards',
+                    search: '#switchSalonSearchBox',
+                    input: '#switchSalonSearchInput',
+                    empty: '#switchSalonEmptyState',
+                    emptyText: '#switchSalonEmptyText',
+                    onChange: function(salonId) {
+                        // تا وقتی سالنِ دیگری انتخاب نشده، دکمه غیرفعال بماند
+                        $('#confirmSwitchSalonBtn').prop('disabled', !salonId || salonId == currentSalonId);
+                    }
+                });
+
+                // هر بار که مودال باز می‌شود، لیست از نو رندر شود
+                $('#switchSalonModal').on('show.bs.modal', function() {
+                    picker.render(salons);
+                    $('#confirmSwitchSalonBtn').prop('disabled', true).html('ثبت و تغییر سالن');
+                });
+
+                $('#confirmSwitchSalonBtn').click(function() {
+                    const salonId = picker.getSelected();
+                    if (!salonId) return;
+
+                    const $btn = $(this);
+                    $btn.prop('disabled', true).html('<i class="bi bi-arrow-repeat"></i> در حال ثبت...');
+
+                    $.ajax({
+                        url: '{{ route('profile.switch-salon') }}',
+                        method: 'POST',
+                        data: {
+                            salon_id: salonId,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            $('#currentSalonName').text(response.salon.name);
+                            $('#switchSalonModal').modal('hide');
+
+                            Swal.fire({
+                                title: 'انجام شد',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            }).then(function() {
+                                // صفحه رفرش می‌شود تا بقیه‌ی اطلاعات وابسته به سالن هم به‌روز شوند
+                                window.location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            let message = 'خطا در تغییر سالن';
+                            if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                            }
+                            Swal.fire({
+                                title: 'خطا',
+                                html: message,
+                                icon: 'error'
+                            });
+                            $btn.prop('disabled', false).html('ثبت و تغییر سالن');
+                        }
+                    });
+                });
+            });
+        </script>
+    @endif
+
     <script>
         // مقادیر اولیه‌ی استان/شهر کاربر (برای پیش‌نمایش در فرم ویرایش)
         const initialProvinceId = @json($userProvinceId);

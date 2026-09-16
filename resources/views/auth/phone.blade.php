@@ -10,9 +10,10 @@
     <title>ورود به سیستم</title>
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}">
     <link rel="stylesheet" href="https://lib.arvancloud.ir/bootstrap-icons/1.9.1/font/bootstrap-icons.css">
-    <link rel="stylesheet"
-        href="https://lib.arvancloud.ir/vazir-font/33.003/Farsi-Digits-Non-Latin/Vazirmatn-FD-NL-font-face.css">
+    {{-- تعریف @font-face ایران‌سنس (ارقام فارسی) - باید قبل از بقیه‌ی استایل‌ها بیاید --}}
+    <link rel="stylesheet" href="{{ asset('asset/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/login.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/css/salon-select.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         .form-step{
@@ -167,24 +168,7 @@
                 </button>
             </div>
 
-            <!-- مرحله 5: انتخاب سالن (برای آرایشگرانی که در چند سالن کار می‌کنند) -->
-            <div id="salonSelectionForm" class="form-step">
-                <div class="form-header">
-                    <h5>انتخاب سالن</h5>
-                    <p>لطفا سالن مورد نظر خود را انتخاب کنید</p>
-                </div>
-                <button type="button" class="back-btn" id="backToRoleSelection">
-                    <i class="bi bi-arrow-right"></i> بازگشت
-                </button>
-
-                <div class="salon-cards" id="salonCards">
-                    <!-- این بخش توسط جاوااسکریپت پر می‌شود -->
-                </div>
-
-                <button class="submit-btn" id="confirmSalonBtn" disabled>
-                    ورود به پنل
-                </button>
-            </div>
+            @include('auth.partials.salon-step')
         </div>
     </div>
 
@@ -192,6 +176,7 @@
     <script src="https://lib.arvancloud.ir/jquery/3.6.3/jquery.js"></script>
     <script src="{{ asset('asset/js/sweetalert2.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap.js') }}"></script>
+    <script src="{{ asset('asset/js/salon-picker.js') }}"></script>
     <script>
         document.getElementById('refresh-captcha').onclick = function() {
             fetch('/refresh-captcha')
@@ -492,42 +477,25 @@
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log('پاسخ سرور:', response);
+                        // سالن‌های آرایشگر همراه همین پاسخ می‌آیند و نگه داشته می‌شوند
+                        userData.salons = response.salons || [];
 
-                        // استخراج نام نقش‌ها از آرایه آبجکت‌ها
-                        const roleNames = response.user_roles ? response.user_roles.map(role => role
-                            .name) : [];
-                        userData.userRoles = roleNames;
-
-                        console.log('نام نقش‌های کاربر:', roleNames);
-
-                        // بررسی سناریوهای مختلف بر اساس پاسخ سرور
                         if (response.requires_gender) {
-                            console.log('سناریو 1: کاربر جدید نیاز به انتخاب جنسیت دارد');
-                            // کاربر جدید - نیاز به انتخاب جنسیت
+                            // کاربر جدید - ابتدا باید جنسیت را انتخاب کند
                             showStep(3);
                         } else if (response.requires_role_selection) {
-                            console.log('سناریو 2: کاربر نیاز به انتخاب نقش دارد');
-                            // کاربر نیاز به انتخاب نقش دارد
-                            prepareRoleSelection(roleNames);
+                            // کاربر آرایشگر/مدیر است - باید حالت ورود را انتخاب کند
+                            prepareRoleSelection(response.user_roles);
                             showStep(4);
                         } else if (response.requires_salon_selection) {
-                            console.log('سناریو 3: آرایشگر نیاز به انتخاب سالن دارد');
-                            // آرایشگر - چند سالن دارد
-                            userData.salons = response.salons || [];
+                            // آرایشگر تک‌نقشه با چند سالن
                             prepareSalonSelection(response.salons);
                             showStep(5);
-                        } else if (response.user_roles && response.user_roles.length > 0) {
-                            console.log('سناریو 4: کاربر نقش دارد و نیازی به انتخاب ندارد');
-                            // کاربر یک نقش دارد و نیازی به انتخاب ندارد
-                            handleDirectLogin(response);
                         } else {
-                            console.log('سناریو 5: هدایت مستقیم');
-                            // هدایت به صفحه اصلی
-                            if (response.redirect_url) {
-                                window.location.href = response.redirect_url;
-                            }
+                            // کاربر عادی - هدایت مستقیم
+                            handleDirectLogin(response);
                         }
+
                         resetVerificationInputs();
                     },
                     error: function(xhr) {
@@ -567,85 +535,38 @@
                 showStep(3);
             });
 
-            // انتخاب نقش کاربر
-            $('.role-card').click(function() {
-                $('.role-card').removeClass('selected');
-                $(this).addClass('selected');
-
-                userData.role = $(this).data('role');
-                $('#confirmRoleBtn').prop('disabled', false);
-            });
-
-            // تکمیل ثبت نام
-            $('#confirmRoleBtn').click(function() {
-                if ($(this).is(':disabled')) return;
-
-                // نمایش وضعیت در حال بارگذاری
-                $('#confirmRoleBtn').html(
-                    '<i class="bi bi-arrow-repeat spinner"></i> در حال ثبت اطلاعات...');
-                $('#confirmRoleBtn').prop('disabled', true);
-
-                // ارسال اطلاعات کامل کاربر به سرور
-                completeRegistration();
-            });
-
-            // تکمیل ثبت نام در سرور
-            function completeRegistration() {
-                $.ajax({
-                    url: '/auth/complete-registration',
-                    method: 'POST',
-                    data: {
-                        gender: userData.gender,
-                        role: userData.role,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        showAlert('موفقیت', 'ثبت نام با موفقیت انجام شد!', 'success');
-
-                        // بستن مودال
-                        $('#loginModal').modal('hide');
-
-                        // هدایت کاربر
-                        if (response.redirect_url) {
-                            setTimeout(function() {
-                                window.location.href = response.redirect_url;
-                            }, 1500);
-                        }
-
-                        resetForm();
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'خطا در تکمیل ثبت نام';
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-                        }
-                        showAlert('خطا', errorMessage, 'error');
-                        $('#confirmRoleBtn').html('تکمیل ثبت نام');
-                        $('#confirmRoleBtn').prop('disabled', false);
-                    }
-                });
-            }
-
             // بازنشانی کامل فرم
             function resetForm() {
                 $('#phoneNumber').val('');
                 resetVerificationInputs();
-                $('.gender-card').removeClass('selected');
-                $('.role-card').removeClass('selected');
+                $('.gender-card, .role-selection-card, .salon-card').removeClass('selected');
+
                 userData = {
                     phoneNumber: '',
+                    captcha: '',
                     verificationCode: '',
                     gender: '',
-                    role: ''
+                    userRoles: [],
+                    selectedRole: '',
+                    salons: [],
+                    selectedSalonId: ''
                 };
 
                 $('#confirmGenderBtn').prop('disabled', true);
-                $('#confirmRoleBtn').prop('disabled', true);
+                $('#confirmRoleSelectionBtn').prop('disabled', true).html('ادامه');
+                $('#confirmSalonBtn').prop('disabled', true).html('ورود به پنل');
                 $('#verifyCodeBtn').html('تایید کد');
-                $('#confirmRoleBtn').html('تکمیل ثبت نام');
 
                 showStep(1);
                 clearInterval(countdownInterval);
+            }
+
+            // استخراج پیام خطا از پاسخ سرور
+            function extractError(xhr, fallback) {
+                if (xhr && xhr.responseJSON && xhr.responseJSON.errors) {
+                    return Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                }
+                return fallback;
             }
 
             // نمایش آلرت
@@ -688,120 +609,106 @@
                 $('#phoneNumber').focus();
             });
 
+            // ---------------------------------------------------------------
+            // مرحله ۴: انتخاب حالت ورود (کاربر عادی / آرایشگر / مدیر)
+            // ---------------------------------------------------------------
+
+            // نقش‌های قابل انتخاب در یک جا تعریف شده‌اند؛ برای افزودن نقش جدید
+            // فقط کافی است یک آیتم به این آرایه اضافه شود.
+            const ROLE_DEFINITIONS = [{
+                    role: 'user',
+                    icon: 'bi-person',
+                    name: 'ورود به عنوان کاربر عادی',
+                    description: 'برای رزرو نوبت در آرایشگاه‌ها'
+                },
+                {
+                    role: 'operator',
+                    icon: 'bi-scissors',
+                    name: 'ورود به پنل آرایشگر',
+                    description: 'برای مدیریت نوبت‌های شخصی'
+                },
+                {
+                    role: 'manager',
+                    icon: 'bi-shop',
+                    name: 'ورود به پنل مدیریت',
+                    description: 'برای مدیریت آرایشگاه و پرسنل'
+                }
+            ];
+
+            // تبدیل پاسخ سرور (آرایه‌ی آبجکت نقش یا رشته) به آرایه‌ی نام نقش‌ها
+            function normalizeRoles(roles) {
+                if (!Array.isArray(roles)) return [];
+                return roles.map(r => (typeof r === 'string' ? r : r.name)).filter(Boolean);
+            }
+
             // آماده‌سازی فرم انتخاب نقش
-            function prepareRoleSelection(userRoles) {
-                let html = '';
+            function prepareRoleSelection(roles) {
+                const roleNames = normalizeRoles(roles);
+                userData.userRoles = roleNames;
 
-                console.log('آماده‌سازی نقش‌ها برای انتخاب:', userRoles);
+                // «کاربر عادی» همیشه در دسترس است، بقیه فقط در صورت داشتن نقش
+                const available = ROLE_DEFINITIONS.filter(def =>
+                    def.role === 'user' || roleNames.includes(def.role)
+                );
 
-                // ابتدا نقش user را بررسی می‌کنیم
-                if (userRoles.includes('user')) {
-                    html += `
-            <div class="role-selection-card" data-role="user">
-                <div class="role-selection-icon">
-                    <i class="bi bi-person"></i>
-                </div>
-                <div class="role-selection-name">ورود به عنوان کاربر عادی</div>
-                <div class="role-selection-description">برای رزرو نوبت در آرایشگاه‌ها</div>
-            </div>
-                `;
-                }
-
-                // سپس نقش operator را بررسی می‌کنیم
-                if (userRoles.includes('operator')) {
-                    html += `
-                    <div class="role-selection-card" data-role="user">
-                <div class="role-selection-icon">
-                    <i class="bi bi-person"></i>
-                </div>
-                <div class="role-selection-name">ورود به عنوان کاربر عادی</div>
-                <div class="role-selection-description">برای رزرو نوبت در آرایشگاه‌ها</div>
-            </div>
-            <div class="role-selection-card" data-role="operator">
-                <div class="role-selection-icon">
-                    <i class="bi bi-scissors"></i>
-                </div>
-                <div class="role-selection-name">ورود به پنل آرایشگر</div>
-                <div class="role-selection-description">برای مدیریت نوبت‌های شخصی</div>
-            </div>
-                `;
-                }
-
-                // سپس نقش manager را بررسی می‌کنیم
-                if (userRoles.includes('manager')) {
-                    html += `
-                    <div class="role-selection-card" data-role="user">
-                <div class="role-selection-icon">
-                    <i class="bi bi-person"></i>
-                </div>
-                <div class="role-selection-name">ورود به عنوان کاربر عادی</div>
-                <div class="role-selection-description">برای رزرو نوبت در آرایشگاه‌ها</div>
-            </div>
-            <div class="role-selection-card" data-role="manager">
-                <div class="role-selection-icon">
-                    <i class="bi bi-shop"></i>
-                </div>
-                <div class="role-selection-name">ورود به پنل مدیریت</div>
-                <div class="role-selection-description">برای مدیریت آرایشگاه و پرسنل</div>
-            </div>
-                `;
-                }
+                const html = available.map(def => `
+                    <div class="role-selection-card" data-role="${def.role}">
+                        <div class="role-selection-icon"><i class="bi ${def.icon}"></i></div>
+                        <div class="role-selection-name">${def.name}</div>
+                        <div class="role-selection-description">${def.description}</div>
+                    </div>
+                `).join('');
 
                 $('#roleSelectionCards').html(html);
+                userData.selectedRole = '';
+                $('#confirmRoleSelectionBtn').prop('disabled', true).html('ادامه');
 
-                // اگر فقط یک نقش وجود داشت، آن را به طور خودکار انتخاب کن
-                if (userRoles.length === 1) {
-                    setTimeout(() => {
-                        $(`.role-selection-card[data-role="${userRoles[0]}"]`).addClass('selected');
-                        userData.selectedRole = userRoles[0];
-                        $('#confirmRoleSelectionBtn').prop('disabled', false);
-                        console.log('تنها یک نقش موجود است، به طور خودکار انتخاب شد:', userRoles[0]);
-                    }, 100);
-                }
-
-                // اضافه کردن رویداد کلیک
-                $('.role-selection-card').off('click').on('click', function() {
-                    $('.role-selection-card').removeClass('selected');
-                    $(this).addClass('selected');
-                    userData.selectedRole = $(this).data('role');
+                // اگر فقط یک گزینه وجود دارد، خودکار انتخاب شود
+                if (available.length === 1) {
+                    $('.role-selection-card').first().addClass('selected');
+                    userData.selectedRole = available[0].role;
                     $('#confirmRoleSelectionBtn').prop('disabled', false);
-                    console.log('نقش انتخاب شد:', userData.selectedRole);
-                });
+                }
             }
+
+            // انتخاب نقش (event delegation - چون کارت‌ها پویا ساخته می‌شوند)
+            $('#roleSelectionCards').on('click', '.role-selection-card', function() {
+                $('.role-selection-card').removeClass('selected');
+                $(this).addClass('selected');
+                userData.selectedRole = $(this).data('role');
+                $('#confirmRoleSelectionBtn').prop('disabled', false);
+            });
+
+            // ---------------------------------------------------------------
+            // مرحله ۵: انتخاب سالن (آرایشگرِ چند سالنه)
+            // منطق کارت‌ها در asset/js/salon-picker.js است تا با مودال
+            // «تغییر سالن» در صفحه‌ی پروفایل مشترک باشد.
+            // ---------------------------------------------------------------
+
+            const salonPicker = SalonPicker({
+                cards: '#salonCards',
+                search: '#salonSearchBox',
+                input: '#salonSearchInput',
+                empty: '#salonEmptyState',
+                emptyText: '#salonEmptyText',
+                onChange: function(salonId) {
+                    userData.selectedSalonId = salonId;
+                    $('#confirmSalonBtn').prop('disabled', !salonId);
+                }
+            });
 
             // آماده‌سازی فرم انتخاب سالن
             function prepareSalonSelection(salons) {
-                let html = '';
+                userData.salons = salons || [];
+                userData.selectedSalonId = '';
 
-                salons.forEach(function(salon, index) {
-                    html += `
-                <div class="salon-card" data-salon-id="${salon.id}">
-                    <div class="salon-name">${salon.name}</div>
-                    <div class="salon-address">${salon.address || 'آدرس مشخص نشده'}</div>
-                    <div class="salon-info">
-                        <span>تعداد پرسنل: ${salon.staff_count || 0}</span>
-                        <span>${salon.is_primary ? 'سالن اصلی' : ''}</span>
-                    </div>
-                </div>
-                `;
-                });
-
-                $('#salonCards').html(html);
-
-                // اضافه کردن رویداد کلیک
-                $('.salon-card').off('click').click(function() {
-                    $('.salon-card').removeClass('selected');
-                    $(this).addClass('selected');
-                    userData.selectedSalonId = $(this).data('salon-id');
-                    $('#confirmSalonBtn').prop('disabled', false);
-                });
+                $('#confirmSalonBtn').prop('disabled', true).html('ورود به پنل');
+                salonPicker.render(userData.salons);
             }
 
             // هدایت مستقیم کاربر
             function handleDirectLogin(response) {
-                console.log('هدایت مستقیم کاربر');
                 if (response.redirect_url) {
-                    console.log('هدایت به:', response.redirect_url);
                     window.location.href = response.redirect_url;
                 } else {
                     // اگر redirect_url وجود نداشت، به صفحه پیش‌فرض هدایت کن
@@ -830,19 +737,18 @@
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        // بررسی اگر کاربر نقش دیگری هم دارد
-                        if (response.user_roles && response.user_roles.length > 1) {
+                        if (response.requires_role_selection) {
                             prepareRoleSelection(response.user_roles);
                             showStep(4);
-                        } else {
-                            // هدایت به صفحه اصلی
-                            if (response.redirect_url) {
-                                window.location.href = response.redirect_url;
-                            }
+                        } else if (response.redirect_url) {
+                            window.location.href = response.redirect_url;
                         }
                     },
                     error: function(xhr) {
-                        // خطا
+                        showAlert('خطا', extractError(xhr, 'خطا در ذخیره اطلاعات'), 'error');
+                    },
+                    complete: function() {
+                        $('#confirmGenderBtn').html('ادامه').prop('disabled', false);
                     }
                 });
             }
@@ -850,8 +756,6 @@
             // تایید انتخاب نقش
             $('#confirmRoleSelectionBtn').click(function() {
                 if ($(this).is(':disabled')) return;
-
-                console.log('تایید نقش انتخاب شده:', userData.selectedRole);
 
                 // نمایش وضعیت بارگذاری
                 $('#confirmRoleSelectionBtn').html(
@@ -867,12 +771,9 @@
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log('پاسخ انتخاب نقش:', response);
-
                         if (response.success) {
                             if (response.requires_salon_selection) {
-                                // نیاز به انتخاب سالن دارد
-                                userData.salons = response.salons || [];
+                                // آرایشگر در چند سالن فعال است - باید یکی را انتخاب کند
                                 prepareSalonSelection(response.salons);
                                 showStep(5);
                             } else if (response.redirect_url) {
@@ -890,67 +791,11 @@
                         }
                     },
                     error: function(xhr) {
-                        let errorMessage = 'خطا در انتخاب نقش';
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
-                                '<br>');
-                        }
-                        showAlert('خطا', errorMessage, 'error');
-                        $('#confirmRoleSelectionBtn').html('ادامه');
-                        $('#confirmRoleSelectionBtn').prop('disabled', false);
+                        showAlert('خطا', extractError(xhr, 'خطا در انتخاب نقش'), 'error');
+                        $('#confirmRoleSelectionBtn').html('ادامه').prop('disabled', false);
                     }
                 });
             });
-
-            // دریافت لیست سالن‌های آرایشگر
-            function getOperatorSalons() {
-                $('#confirmRoleSelectionBtn').html('<i class="bi bi-arrow-repeat spinner"></i> در حال بارگذاری...');
-                $('#confirmRoleSelectionBtn').prop('disabled', true);
-
-                $.ajax({
-                    url: '/auth/get-operator-salons',
-                    method: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.salons && response.salons.length > 1) {
-                            userData.salons = response.salons;
-                            prepareSalonSelection(response.salons);
-                            showStep(5);
-                        } else if (response.salons && response.salons.length === 1) {
-                            // فقط یک سالن دارد - مستقیم وارد شود
-                            userData.selectedSalonId = response.salons[0].id;
-                            completeSalonSelection();
-                        } else {
-                            showAlert('خطا', 'شما به هیچ سالنی دسترسی ندارید', 'error');
-                        }
-                    },
-                    error: function(xhr) {
-                        // خطا
-                    }
-                });
-            }
-
-            // تکمیل انتخاب نقش
-            function completeRoleSelection() {
-                $.ajax({
-                    url: '/auth/select-role',
-                    method: 'POST',
-                    data: {
-                        role: userData.selectedRole,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.redirect_url) {
-                            window.location.href = response.redirect_url;
-                        }
-                    },
-                    error: function(xhr) {
-                        // خطا
-                    }
-                });
-            }
 
             // تایید انتخاب سالن
             $('#confirmSalonBtn').click(function() {
@@ -960,8 +805,14 @@
 
             // تکمیل انتخاب سالن
             function completeSalonSelection() {
-                $('#confirmSalonBtn').html('<i class="bi bi-arrow-repeat spinner"></i> در حال ورود...');
-                $('#confirmSalonBtn').prop('disabled', true);
+                if (!userData.selectedSalonId) {
+                    showAlert('خطا', 'ابتدا یک سالن را انتخاب کنید', 'error');
+                    return;
+                }
+
+                $('#confirmSalonBtn')
+                    .html('<i class="bi bi-arrow-repeat spinner"></i> در حال ورود...')
+                    .prop('disabled', true);
 
                 $.ajax({
                     url: '/auth/select-salon',
@@ -973,10 +824,14 @@
                     success: function(response) {
                         if (response.redirect_url) {
                             window.location.href = response.redirect_url;
+                        } else {
+                            showAlert('خطا', 'پاسخ سرور نامعتبر است', 'error');
+                            $('#confirmSalonBtn').html('ورود به پنل').prop('disabled', false);
                         }
                     },
                     error: function(xhr) {
-                        // خطا
+                        showAlert('خطا', extractError(xhr, 'خطا در انتخاب سالن'), 'error');
+                        $('#confirmSalonBtn').html('ورود به پنل').prop('disabled', false);
                     }
                 });
             }

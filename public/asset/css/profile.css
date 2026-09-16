@@ -655,3 +655,75 @@ i.bi {
 .like-btn.active {
     color: #f12d2d;
 }
+
+/* =========================================================================
+   سالن فعال کاربر در هدر پروفایل + دکمه‌ی تغییر سالن
+   (کارت‌های داخل مودال از asset/css/salon-select.css استایل می‌گیرند)
+   ========================================================================= */
+.profile-salon {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.profile-salon-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 5px 12px;
+    border-radius: 99px;
+    background-color: rgba(255, 255, 255, .18);
+    border: 1px solid rgba(255, 255, 255, .28);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+}
+
+.profile-salon-badge > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.salon-switch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, .45);
+    background-color: transparent;
+    color: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color .25s ease, border-color .25s ease, transform .25s ease;
+}
+
+.salon-switch-btn:hover {
+    background-color: rgba(255, 255, 255, .22);
+    border-color: #fff;
+    transform: translateY(-1px);
+}
+
+.salon-switch-btn:active {
+    transform: translateY(0);
+}
+
+/* متن راهنمای بالای مودال تغییر سالن */
+.salon-switch-hint {
+    margin-bottom: 14px;
+    color: #8b8585;
+    font-size: 13px;
+    text-align: right;
+}
+
+/* مودال تغییر سالن: لیست بلندتر از مرحله‌ی ورود جا می‌شود */
+#switchSalonModal .salon-cards {
+    max-height: 340px;
+}

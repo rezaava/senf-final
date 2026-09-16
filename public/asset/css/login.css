@@ -25,9 +25,22 @@
         margin: 0;
     }
 
+    /* فونت ایران‌سنس روی کل صفحه.
+       عناصر فرم و دکمه‌ها فونت را از body ارث نمی‌برند (بوت‌استرپ و خود مرورگر
+       فونت جداگانه به آن‌ها می‌دهند) پس صریحاً اینجا ست می‌شوند.
+       تعریف @font-face در asset/css/fonts.css است. */
+    body,
+    input,
+    button,
+    select,
+    textarea,
+    .swal2-container,
+    .swal2-popup {
+        font-family: 'IRANSansX', 'Vazirmatn', Tahoma, sans-serif !important;
+    }
+
     body {
         background-color: var(--color-background);
-        font-family: 'Vazirmatn FD NL', 'Tanha', 'Roboto', sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -605,47 +618,4 @@
         color: #6c757d;
     }
 
-    /* استایل برای کارت‌های انتخاب سالن */
-    .salon-cards {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    .salon-card {
-        padding: 20px;
-        border: 2px solid #e1e5e9;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .salon-card:hover {
-        border-color: var(--color-primary);
-        transform: translateY(-2px);
-    }
-
-    .salon-card.selected {
-        border-color: var(--color-primary);
-        background-color: var(--color-secondary-light);
-    }
-
-    .salon-name {
-        font-weight: 600;
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-
-    .salon-address {
-        font-size: 12px;
-        color: #6c757d;
-        margin-bottom: 8px;
-    }
-
-    .salon-info {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        color: #495057;
-    }
+    /* استایل کارت‌های انتخاب سالن به فایل asset/css/salon-select.css منتقل شد */

@@ -32,16 +32,30 @@
         .overlay img {
             animation: logoAnimation 1.5s infinite ease-in-out;
         }
+
+        @keyframes logoAnimation {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+        
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        
+            100% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+            }
     </style>
 @endsection
 @section('content')
-<<<<<<< HEAD
 <div class="overlay position-absolute" id="loader">
             <img id="img" class="w-50" src="{{ asset('images/logo.png') }}" alt="logo">
 </div>
 
-=======
->>>>>>> 49d86011d3ffa1920c3cc96af3e52261b0515602
     
     <div class="container">
         <div class="header-main mb-3">

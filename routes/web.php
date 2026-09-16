@@ -110,6 +110,8 @@ Route::post('/set-city', [SiteController::class, 'setCity'])->name('set.city');
 // user profile
 Route::get('/profile', [WebUserController::class, 'profile'])->name('profile');
 Route::post('/profile/update', [WebUserController::class, 'update'])->name('profile.update');
+// تغییر سالن فعال از داخل پروفایل (برای کاربرانی که در چند سالن عضو هستند)
+Route::post('/profile/switch-salon', [WebUserController::class, 'switchSalon'])->name('profile.switch-salon');
 
 // comment store
 Route::post('/comments/store', [CommentController::class, 'store'])->middleware('auth');

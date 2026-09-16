@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organ;
 use App\Models\PhoneVerification;
 use App\Models\User; // اگر مدل کارمندان سالن دارید
+use App\Services\OperatorSalonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 
 class OtpAuthController extends Controller
 {
+    public function __construct(protected OperatorSalonService $salons) {}
+
     /**
      * Step 1: فرم ورود شماره
      */
@@ -184,16 +186,9 @@ class OtpAuthController extends Controller
                     $responseData['requires_role_selection'] = true;
                     $responseData['user_roles'] = $user->roles;
 
-                    // اگر آرایشگر است، بررسی تعداد سالن‌ها
+                    // اگر آرایشگر است، لیست سالن‌ها از همین حالا همراه پاسخ فرستاده می‌شود
                     if ($user->hasRole('operator')) {
-                        $salons = $this->getOperatorSalonsData($user);
-                        if (count($salons) > 1) {
-                            $responseData['salons'] = $salons;
-                            $responseData['requires_salon_selection'] = true;
-                        } elseif (count($salons) === 1) {
-                            $responseData['salons'] = $salons;
-                            $responseData['requires_salon_selection'] = false;
-                        }
+                        $responseData['salons'] = $this->salons->presentFor($user);
                     }
                 } else {
                     // فقط کاربر عادی است
@@ -299,28 +294,31 @@ class OtpAuthController extends Controller
 
         // اگر نقش آرایشگر انتخاب شده، بررسی سالن‌ها
         if ($selectedRole === 'operator') {
-            $salons = $this->getOperatorSalonsData($user);
+            $salons = $this->salons->presentFor($user);
 
+            // هیچ سالن فعالی ندارد
+            if (count($salons) === 0) {
+                return response()->json([
+                    'errors' => ['general' => ['شما در هیچ سالنی عضو فعال نیستید']],
+                ], 403);
+            }
+
+            // بیش از یک سالن: باید یکی را انتخاب کند
             if (count($salons) > 1) {
                 return response()->json([
                     'success' => true,
                     'requires_salon_selection' => true,
                     'salons' => $salons,
                 ]);
-            } elseif (count($salons) === 1) {
-                // فقط یک سالن دارد - ذخیره و هدایت
-                session(['selected_salon_id' => $salons[0]['id']]);
-
-                return response()->json([
-                    'success' => true,
-                    'redirect_url' => $this->getRedirectUrl($user, $selectedRole, $salons[0]['id']),
-                ]);
-            } else {
-                // هیچ سالنی ندارد
-                return response()->json([
-                    'errors' => ['general' => ['شما به هیچ سالنی دسترسی ندارید']],
-                ], 403);
             }
+
+            // فقط یک سالن دارد - بدون پرسش ذخیره شود و وارد پنل شود
+            $this->salons->select($user, $salons[0]['id']);
+
+            return response()->json([
+                'success' => true,
+                'redirect_url' => $this->getRedirectUrl($user, $selectedRole, $salons[0]['id']),
+            ]);
         }
 
         if ($selectedRole === 'manager') {
@@ -336,7 +334,12 @@ class OtpAuthController extends Controller
                 'success' => true,
                 'redirect_url' => $this->getRedirectUrl($user, $selectedRole),
             ]);
-         }
+        }
+
+        // کاربر عادی: سالن فعال پاک می‌شود تا پنل سالن به‌اشتباه باز نماند
+        if ($selectedRole === 'user') {
+            $this->salons->clear($user);
+        }
 
         // برای سایر نقش‌ها
         return response()->json([
@@ -364,11 +367,9 @@ class OtpAuthController extends Controller
             ], 403);
         }
 
-        $salons = $this->getOperatorSalonsData($user);
-
         return response()->json([
             'success' => true,
-            'salons' => $salons,
+            'salons' => $this->salons->presentFor($user),
         ]);
     }
 
@@ -399,20 +400,21 @@ class OtpAuthController extends Controller
         }
 
         // بررسی دسترسی کاربر به این سالن
-        $hasAccess = $this->checkOperatorSalonAccess($user, $request->salon_id);
-
-        if (! $hasAccess) {
+        if (! $this->salons->canAccess($user, $request->salon_id)) {
             return response()->json([
                 'errors' => ['salon_id' => ['شما به این سالن دسترسی ندارید']],
             ], 403);
         }
 
-        // ذخیره سالن انتخابی در سشن
-        session(['selected_salon_id' => $request->salon_id]);
+        // ذخیره سالن انتخابی در ستون users.organ_id و سشن
+        $organ = $this->salons->select($user, $request->salon_id);
+
+        session(['selected_role' => 'operator']);
 
         return response()->json([
             'success' => true,
-            'redirect_url' => $this->getRedirectUrl($user, 'operator', $request->salon_id),
+            'salon' => ['id' => $organ->id, 'name' => $organ->name],
+            'redirect_url' => $this->getRedirectUrl($user, 'operator', $organ->id),
         ]);
     }
 
@@ -468,36 +470,6 @@ class OtpAuthController extends Controller
         }
 
         return back()->with('success', 'کد جدید ارسال شد');
-    }
-
-    /**
-     * دریافت اطلاعات سالن‌های آرایشگر
-     */
-    protected function getOperatorSalonsData(User $user)
-    {
-        $salons = $user->organs;
-
-        return $salons;
-    }
-
-    /**
-     * بررسی دسترسی آرایشگر به سالن
-     */
-    protected function checkOperatorSalonAccess(User $user, $salonId)
-    {
-        // TODO: پیاده‌سازی بررسی دسترسی
-        // مثال:
-        $organ = Organ::findOrFail($salonId);
-        if (! $organ) {
-            return false;
-        }
-        if (! $user->organs()->contains($organ)) {
-            return false;
-        }
-        $user->OrganSelected()->associate($organ);
-        $user->save();
-
-        return true;
     }
 
     /**
@@ -602,7 +574,7 @@ class OtpAuthController extends Controller
     protected function convertToEnglishNumbers(string $input): string
     {
         $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-        $arabic  = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
         $input = str_replace($persian, $english, $input);

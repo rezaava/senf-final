@@ -1,0 +1,91 @@
+/* =========================================================================
+   فونت ایران‌سنس ایکس (نسخه‌ی FaNum - ارقام فارسی)
+   ------------------------------------------------------------------------
+   این فایل فقط تعریف @font-face را دارد تا هر صفحه‌ای (حتی صفحه‌هایی که
+   main.css را لود نمی‌کنند، مثل صفحه‌ی ورود) بتواند فونت را داشته باشد.
+   مسیر فایل‌ها نسبت به همین فایل است: public/asset/css/fonts/...
+
+   نکته: نسخه‌ی FaNum ارقام لاتین را با گلیف فارسی نمایش می‌دهد؛
+   یعنی value ورودی‌ها همچنان لاتین می‌ماند و فقط ظاهرش فارسی است.
+   ========================================================================= */
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-Thin.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-Thin.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-UltraLight.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-UltraLight.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-Light.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-Light.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-regular.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-regular.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-medium.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-medium.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-demibold.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-demibold.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-bold.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-bold.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-extrabold.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-extrabold.woff") format("woff");
+}
+
+@font-face {
+    font-family: IRANSansX;
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url("fonts/woff2/IRANSansXFaNum-black.woff2") format("woff2"),
+        url("fonts/woff/IRANSansXFaNum-black.woff") format("woff");
+}
